@@ -1,0 +1,324 @@
+   0:   /*#$& test3.c */
+   0:   /*#$& ../lib/lib.c */
+   1: 
+   2: //	1文字キー入力
+   3: int getchA()
+   4: {
+   5: 	_asm{
+   6: 		;ah=0x01: エコーあり Ctrl-C チェックあり
+   7: 		;ah=0x06: エコーあり Ctrl-Cチェックなし
+   8: 		;ah=0x07: エコーなし Ctrl-Cチェックなし
+   9: 		;ah=0x08: エコーなし Ctrl-Cチェックあり
+  10: 		mov		ah,0x01
+  11: 		int		0x21
+  12: 		xor		ebx,ebx
+  13: 		mov		bl,al
+  14: 		mov		eax,ebx
+  15: 	}
+  16: }
+  17: 
+  18: int getch()
+  19: {
+  20: 	int c;
+  21: 	
+  22: 	while((c=getchA())==0)
+  23: 		;
+  24: 	if(c=='\r'){
+  25: 		c = '\n';
+  26: 	}
+  27: 	return c;
+  28: }
+  29: 
+  30: void putchA(char c)
+  31: {
+  32: 	_asm{
+  33: 		mov		dl,[ebp+_putch@_c]
+  34: 		mov		ah,0x02
+  35: 		int		0x21
+  36: 	}
+  37: }
+  38: 
+  39: void putch(char c)
+  40: {
+  41: 	if(c=='\n'){
+  42: 		putchA('\r');
+  43: 	}
+  44: 	putchA(c);
+  45: }
+  46: 
+  47: void gets(char *str, int len)
+  48: {
+  49: 	int i;
+  50: 	
+  51: 	for(i=0; i<len; i++){
+  52: 		if((*str=getch())=='\n'){
+  53: 			putch('\n');
+  54: 			*str = 0;
+  55: 			return;
+  56: 		}
+  57: 		if(*str=='\b'){
+  58: 			if(i){
+  59: 				--i;
+  60: 				--str;
+  61: 			}
+  62: 			--i;
+  63: 			--str;
+  64: 		}
+  65: 		++str;
+  66: 	}
+  67: }
+  68: 
+  69: void puts(char *str)
+  70: {
+  71: 	while(*str){
+  72: 		putch(*str++);
+  73: 	}
+  74: }
+  75: 
+  76: void exit(char code)
+  77: {
+  78: 	_asm{
+  79: 		mov		al,[ebp+_exit@_code]
+  80: 		mov		ah,0x4c
+  81: 		int		0x21
+  82: 	}
+  83: }
+  84: 
+  85: void printf_1x(unsigned int d)
+  86: {
+  87: 	d &= 0x0000000f;
+  88: 	if(d < 10){
+  89: 		putch('0' + d);
+  90: 	}
+  91: 	else{
+  92: 		putch('A' + d - 10);
+  93: 	}
+  94: }
+  95: 
+  96: void printf_2x(unsigned int d)
+  97: {
+  98: 	printf_1x(d/16 & 0xf);
+  99: 	printf_1x(d & 0xf);
+ 100: }
+ 101: 
+ 102: void printf_4x(unsigned int d)
+ 103: {
+ 104: 	printf_2x(d/0x100 & 0xff);
+ 105: 	printf_2x(d & 0xff);
+ 106: }
+ 107: 
+ 108: void printf_8x(unsigned int d)
+ 109: {
+ 110: 	printf_4x(d/0x10000 & 0xffff);
+ 111: 	printf_4x(d & 0xffff);
+ 112: }
+ 113: 
+ 114: void printf_x(unsigned int d)
+ 115: {
+ 116: 	if(d / 16){
+ 117: 		printf_x(d/16);
+ 118: 	}
+ 119: 	printf_1x(d);
+ 120: }
+ 121: 
+ 122: void printf_u(unsigned int d)
+ 123: {
+ 124: 	
+ 125: 	if(d / 10){
+ 126: 		printf_u(d / 10);
+ 127: 	}
+ 128: 	putch('0' + d%10);
+ 129: }
+ 130: 
+ 131: void printf_d(int d)
+ 132: {
+ 133: 	if(d < 0){
+ 134: 		putch('-');
+ 135: 		d = -d;
+ 136: 	}
+ 137: 	printf_u(d);
+ 138: }
+ 139: 
+ 140: int memcmp(void *dst, void *src, unsigned int size)
+ 141: {
+ 142: 	int i;
+ 143: 	int tmp;
+ 144: 	unsigned char *dst1;
+ 145: 	unsigned char *src1;
+ 146: 	
+ 147: 	dst1 = (unsigned char *)dst;
+ 148: 	src1 = (unsigned char *)src;
+ 149: 	for(i=0; i<size; ++i){
+ 150: 		if((tmp = dst1[i]-src1[i])){
+ 151: 			return tmp;
+ 152: 		}
+ 153: 	}
+ 154: 	return 0;
+ 155: }
+ 156: 
+ 157: int strcmp(char *dst, char *src)
+ 158: {
+ 159: 	int i;
+ 160: 	int tmp;
+ 161: 	
+ 162: 	for(i=0; ; ++i){
+ 163: 		if((tmp = (unsigned char)dst[i]-(unsigned char)src[i]))
+ 164: 			return tmp;
+ 165: 		if(src[i]==0)
+ 166: 			return 0;
+ 167: 	}
+ 168: }
+   0:   /*#$& test3.c */
+   2: 
+   4: 
+   5: 
+   6: char symbuf[64];
+   7: char *linebufp;
+   8: 
+   9: 
+  10: int getnum(char *str)
+  11: {
+  12: 	int numb, neg;
+  13: 	
+  14: 	numb = 0;
+  15: 	if(*str=='-'){
+  16: 		neg = -1;
+  17: 		++str;
+  18: 	}
+  19: 	else{
+  20: 		neg = 1;
+  21: 	}
+  22: 	if(memcmp(str, "0x", 2)==0){	// 0x ...
+  23: 		str += 2;
+  24: 		for(;;){
+  25: 			if(*str>='0' && *str<='9'){
+  26: 				numb = numb*16 + *str - '0';
+  27: 			}
+  28: 			else if(*str>='A' && *str<='F'){
+  29: 				numb = numb*16 + *str -'A' +10;
+  30: 			}
+  31: 			else if(*str>='a' && *str<='f'){
+  32: 				numb = numb*16 + *str -'a' +10;
+  33: 			}
+  34: 			else{
+  35: 				return numb*neg;
+  36: 			}
+  37: 			str++;
+  38: 		}
+  39: 	}
+  40: 	else{
+  41: 		for(;;){
+  42: 			if(*str>='0' && *str<='9'){
+  43: 				numb = numb*10 + *str - '0';
+  44: 			}
+  45: 			else{
+  46: 				return numb*neg;
+  47: 			}
+  48: 			str++;
+  49: 		}
+  50: 	}
+  51: }
+  52: 
+  53: void spskip()
+  54: {
+  55: 	while(*linebufp==' ' || *linebufp=='\t'){
+  56: 		linebufp++;
+  57: 	}
+  58: }
+  59: 
+  60: void getsym()
+  61: {
+  62: 	int i;
+  63: 	
+  64: 	spskip();
+  65: 	for(i=0; i<64-1; i++){
+  66: 		if(*linebufp==' ' || *linebufp=='\t' || *linebufp==0 || *linebufp=='\n'){
+  67: 			symbuf[i] = 0;
+  68: 			return;
+  69: 		}
+  70: 		symbuf[i] = *linebufp++;
+  71: 	}
+  72: 	symbuf[i] = 0;
+  73: }
+  74: 
+  75: void help()
+  76: {
+  77: 	putch('\n');
+  78: 	puts("> help                    ... help message\n");
+  79: 	puts("> dump <addr> <len>       ... hex dump\n");
+  80: 	puts("> exit                    ... exit\n");
+  81: 	putch('\n');
+  82: }
+  83: 
+  84: void dump(unsigned int addr, unsigned int len)
+  85: {
+  86: 	int i, pre_len;
+  87: 	
+  88: 	if(len==0){
+  89: 		len = 16;
+  90: 	}
+  91: 	pre_len = (addr & 0xf);
+  92: 	addr &= 0xfffffff0;
+  93: 	puts("addr:  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
+  94: 	if(pre_len){
+  95: 		printf_4x(addr);
+  96: 		putch(':');
+  97: 		for(i=0; i<pre_len; i++){
+  98: 			puts("   ");
+  99: 		}
+ 100: 		for( ; i<16; i++){
+ 101: 			putch(' ');
+ 102: 			printf_2x(*(char*)(addr+i));
+ 103: 			if(--len==0){
+ 104: 				putch('\n');
+ 105: 				return;
+ 106: 			}
+ 107: 		}
+ 108: 		putch('\n');
+ 109: 		addr += 16;
+ 110: 	}
+ 111: 	for(;;){
+ 112: 		printf_4x(addr);
+ 113: 		putch(':');
+ 114: 		for(i=0; i<16; i++){
+ 115: 			putch(' ');
+ 116: 			printf_2x(*(char*)(addr+i));
+ 117: 			if(--len==0){
+ 118: 				putch('\n');
+ 119: 				return;
+ 120: 			}
+ 121: 		}
+ 122: 		putch('\n');
+ 123: 		addr += 16;
+ 124: 	}
+ 125: }
+ 126: 
+ 127: int main()
+ 128: {
+ 129: 	char buf[256];
+ 130: 	unsigned int addr, len;
+ 131: 	
+ 132: 	puts("\nhelp message is \"help\"\n\n");
+ 133: 	for(;;){
+ 134: 		puts("> ");
+ 135: 		gets(buf, 256);
+ 136: 		linebufp = buf;
+ 137: 		getsym();
+ 138: 		if(strcmp(symbuf, "help")==0){
+ 139: 			help();
+ 140: 		}
+ 141: 		else if(strcmp(symbuf, "dump")==0){
+ 142: 			getsym();
+ 143: 			addr = getnum(symbuf);
+ 144: 			getsym();
+ 145: 			len  = getnum(symbuf);
+ 146: 			dump(addr, len);
+ 147: 		}
+ 148: 		else if(strcmp(symbuf, "exit")==0){
+ 149: 			return 0;
+ 150: 		}
+ 151: 		else{
+ 152: 			puts("*** error\n");
+ 153: 		}
+ 154: 	}
+ 155: }

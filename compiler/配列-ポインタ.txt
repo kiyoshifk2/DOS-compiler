@@ -1,0 +1,95 @@
+配列-ポインタ
+
+int array[10][20];
+int main(char c[20][30])
+{
+	int a[5][7];
+
+	array[3][4];
+	a[2][5];
+	c[3][6];
+}
+
+実行部で array を処理すると
+　　expr_p1->operand[]="_array";
+　　expr_p1->comment  = COM1;		// 定数
+　　expr_p1->attr = int ２次元配列 [10][20]
+
+array[3] を処理すると
+    expr_p1->operand[]="_array+sizeof(int)*20*3";
+    expr_p1->comment  = COM1;		// 定数
+    expr_p1->attr = int １次元配列 [20]
+
+実行部で a を処理すると
+    expr_p1->operand[]="ebp+_main@_a";
+    expr_p1->comment  = COM11;		// 変数アドレス
+    expr_p1->attr = int ２次元配列 [5][7];
+
+a[2] を処理すると
+    mov		eax, ebp+_main@_a
+    expr_p1->operand[]="eax+sizeof(int)*7*2"
+    expr_p1->comment  = COM11;		// 変数アドレス
+　　expr_p1->attr = int １次元配列[7]
+
+実行部で c を処理すると
+    expr_p1->operand[]~"ebp+_main@_c";
+    expr_p1->comment  = COM11;		// 変数アドレス
+    expr_p1->attr = char ２次元配列 [20][30] へのポインタ
+
+c[3] を処理すると
+    mov		eax, [ebp+_main@_c]
+    expr_p1->operand[]="eax+sizeof(char)*30*3"
+    expr_p1->comment  = COM11;		// 変数アドレス
+    expr_p1->attr = char １次元配列 [30]   ... 「へのポインタ」は取り除かれる
+
+..................................................................................
+
+*factor13 とは
+
+char *str;    attr = ATTR_POINTER1 | ATTR_CHAR               COM22:変数  operand=[_str]
+c = *str;     attr = ATTR_CHAR        eax=[_str] を実行して  COM20:定数  operand=eax
+
+char buf[5];  １次元配列　       　  COM21:配列名　operand=_buf
+char c = *buf; ATTR_CHAR   eax=_buf  COM20:定数　  operand=[_buf]
+char *str=buf; １次元配列  eax=_buf  COM20:定数    operand=eax
+
+int a[4][10]; ２次元配列　　　　　　COM21:配列名  operand=_a
+　  *a;       １次元配列（10要素）  COM21:配列名　operand=_a
+int *i=*a;    ポインタ　eax=_a　　　COM20:定数    operand=eax
+
+int **ptr;　２次ポインタ            COM22:変数名  operand=[_ptr]
+    *ptr    １次ポインタ eax=[_ptr] COM20:定数　　operand=[eax]
+
+int *k;   １次ポインタ           COM22:変数名　operand=[_k]
+    *k     ATTR_INT    eax=[_k]  COM22:変数    operand=[eax]
+
+従って  *v
+    配列
+　　　　attr:    次元数を下げる
+        operand:
+            元が多次元: COM21:operand 変更なし
+　　　　　　元が１次元: COM22:[旧operand]
+    else ポインタ
+　　　　attr:   次数を下げる
+　　　　operand: convert_com20();  operand=[eax] COM22
+    else
+        E_SYNTAX_ERROR
+
+...................................................................
+
+&factor13 とは
+
+int i[10];
+    &i;    はエラーにする
+
+int i;
+    &i   １次ポインタ  convert_com22();
+
+int *pt;  operand=[_pt] 又は [0x1234] 又は [eax]
+    &pt  ２次ポインタ  convert_com22();
+
+従って  &v
+    配列はエラー
+    その他
+　　　　attr: ポインタ次数を上げる
+　　　　operand: convert_com22(); そのまま

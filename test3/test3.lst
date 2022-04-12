@@ -1,0 +1,2765 @@
+     1                                  [BITS 16]
+     2                                  	org		0x100
+     3 00000000 E98412                  	jmp		startup
+     4                                  ;   0:   /*#$& test3.c */
+     5                                  ;   0:   /*#$& ../lib/lib.c */
+     6                                  ;   1: 
+     7                                  ;   2: //	1文字キー入力
+     8                                  ;   3: int getchA()
+     9                                  ;---------- function _getchA ----------
+    10                                  _getchA:
+    11 00000003 6655                    	push	ebp
+    12 00000005 6689E5                  	mov		ebp, esp
+    13                                  ;---------- parser_function_block ----------
+    14                                  ;   4: {
+    15                                  ;---------- parser_asm ----------
+    16                                  ;   5: 	_asm{
+    17                                  		;ah=0x01: エコーあり Ctrl-C チェックあり
+    18                                  		;ah=0x06: エコーあり Ctrl-Cチェックなし
+    19                                  		;ah=0x07: エコーなし Ctrl-Cチェックなし
+    20                                  		;ah=0x08: エコーなし Ctrl-Cチェックあり
+    21 00000008 B401                    		mov		ah,0x01
+    22 0000000A CD21                    		int		0x21
+    23 0000000C 6631DB                  		xor		ebx,ebx
+    24 0000000F 88C3                    		mov		bl,al
+    25 00000011 6689D8                  		mov		eax,ebx
+    26                                  L2416:
+    27                                  ;  16: }
+    28 00000014 665D                    	pop		ebp
+    29 00000016 C3                      	ret
+    30                                  ;  17: 
+    31                                  ;  18: int getch()
+    32                                  _getch@_c	equ	0
+    33                                  ;---------- function _getch ----------
+    34                                  _getch:
+    35 00000017 6655                    	push	ebp
+    36 00000019 6683C4FC                	add		esp, -4		; auto variable
+    37 0000001D 6689E5                  	mov		ebp, esp
+    38                                  ;---------- parser_function_block ----------
+    39                                  ;  19: {
+    40                                  ;  20: 	int c;
+    41                                  ;---------- parser_while ----------
+    42                                  ;  21: 	
+    43                                  ;  22: 	while((c=getchA())==0)
+    44                                  L2418:
+    45                                  ;---------- c32_expr ----------
+    46                                  ;---------- c32_expr ----------
+    47                                  ;---------- call _getchA ----------
+    48 00000020 E8E0FF                  	call	_getchA		;expr_function_call
+    49 00000023 6667894500              	mov		[ebp+_getch@_c], eax	;expr_eq
+    50                                  ;---------- c32_expr end ------
+    51 00000028 66678B4500              	mov		eax, [ebp+_getch@_c]		;convert_com20
+    52 0000002D 6650                    	push	eax		;factor8
+    53 0000002F 66B800000000            	mov		eax, 0x0		;convert_com20
+    54 00000035 665B                    	pop		ebx		;factor8
+    55 00000037 6639D8                  	cmp		eax, ebx	;factor8
+    56 0000003A 66B801000000            	mov		eax, 1	;factor8-9
+    57 00000040 7402                    	jz		L2424		;factor8-10
+    58 00000042 6648                    	dec		eax		;factor8-11
+    59                                  L2424:		;factor8
+    60                                  ;---------- c32_expr end ------
+    61 00000044 6621C0                  	and		eax, eax
+    62 00000047 7402                    	jz		L2417
+    63                                  L2419:
+    64                                  ;---------- parser_block ----------
+    65                                  ;  23: 		;
+    66 00000049 EBD5                    	jmp		L2418
+    67                                  L2417:
+    68                                  ;---------- parser_if ----------
+    69                                  ;  24: 	if(c=='\r'){
+    70                                  ;---------- c32_expr ----------
+    71 0000004B 66678B4500              	mov		eax, [ebp+_getch@_c]		;convert_com20
+    72 00000050 6650                    	push	eax		;factor8
+    73 00000052 66B80D000000            	mov		eax, 0xd		;convert_com20
+    74 00000058 665B                    	pop		ebx		;factor8
+    75 0000005A 6639D8                  	cmp		eax, ebx	;factor8
+    76 0000005D 66B801000000            	mov		eax, 1	;factor8-9
+    77 00000063 7402                    	jz		L2453		;factor8-10
+    78 00000065 6648                    	dec		eax		;factor8-11
+    79                                  L2453:		;factor8
+    80                                  ;---------- c32_expr end ------
+    81 00000067 6621C0                  	and		eax, eax
+    82 0000006A 740D                    	jz		L2447
+    83                                  ;---------- parser_block ----------
+    84                                  ;---------- parser_function_block ----------
+    85                                  ;---------- parser_dainyuu ----------
+    86                                  ;---------- c32_expr ----------
+    87                                  ;  25: 		c = '\n';
+    88 0000006C 66B80A000000            	mov		eax, 0xa		;convert_com20
+    89 00000072 6667894500              	mov		[ebp+_getch@_c], eax	;expr_eq
+    90                                  ;---------- c32_expr end ------
+    91                                  ;  26: 	}
+    92 00000077 EB00                    	jmp		L2448
+    93                                  L2447:
+    94                                  L2448:
+    95                                  ;----------  parser_return  ---------
+    96                                  ;  27: 	return c;
+    97                                  ;---------- c32_expr ----------
+    98                                  ;---------- c32_expr end ------
+    99 00000079 66678B4500              	mov		eax, [ebp+_getch@_c]		;convert_com20
+   100 0000007E 6683C404                	add		esp, 4		; auto variable clear
+   101 00000082 665D                    	pop		ebp
+   102 00000084 C3                      	ret
+   103                                  ;  28: }
+   104 00000085 6683C404                	add		esp, 4		; auto variable clear
+   105 00000089 665D                    	pop		ebp
+   106 0000008B C3                      	ret
+   107                                  ;  29: 
+   108                                  ;  30: void putchA(char c)
+   109                                  _putchA@_c	equ	6
+   110                                  ;---------- function _putchA ----------
+   111                                  _putchA:
+   112 0000008C 6655                    	push	ebp
+   113 0000008E 6689E5                  	mov		ebp, esp
+   114                                  ;---------- parser_function_block ----------
+   115                                  ;  31: {
+   116                                  ;---------- parser_asm ----------
+   117                                  ;  32: 	_asm{
+   118 00000091 678A5506                		mov		dl,[ebp+_putch@_c]
+   119 00000095 B402                    		mov		ah,0x02
+   120 00000097 CD21                    		int		0x21
+   121                                  L2484:
+   122                                  ;  37: }
+   123 00000099 665D                    	pop		ebp
+   124 0000009B C3                      	ret
+   125                                  ;  38: 
+   126                                  ;  39: void putch(char c)
+   127                                  _putch@_c	equ	6
+   128                                  ;---------- function _putch ----------
+   129                                  _putch:
+   130 0000009C 6655                    	push	ebp
+   131 0000009E 6689E5                  	mov		ebp, esp
+   132                                  ;---------- parser_function_block ----------
+   133                                  ;  40: {
+   134                                  ;---------- parser_if ----------
+   135                                  ;  41: 	if(c=='\n'){
+   136                                  ;---------- c32_expr ----------
+   137 000000A1 678A4506                	mov		al, [ebp+_putch@_c]		;convert_com20
+   138 000000A5 98                      	cbw		;convert_com10
+   139 000000A6 66                      	db 0x66
+   140 000000A7 98                      	db 0x98		;convert_com10
+   141 000000A8 6650                    	push	eax		;factor8
+   142 000000AA 66B80A000000            	mov		eax, 0xa		;convert_com20
+   143 000000B0 665B                    	pop		ebx		;factor8
+   144 000000B2 6639D8                  	cmp		eax, ebx	;factor8
+   145 000000B5 66B801000000            	mov		eax, 1	;factor8-9
+   146 000000BB 7402                    	jz		L2491		;factor8-10
+   147 000000BD 6648                    	dec		eax		;factor8-11
+   148                                  L2491:		;factor8
+   149                                  ;---------- c32_expr end ------
+   150 000000BF 6621C0                  	and		eax, eax
+   151 000000C2 7418                    	jz		L2485
+   152                                  ;---------- parser_block ----------
+   153                                  ;---------- parser_function_block ----------
+   154                                  ;---------- parser_dainyuu ----------
+   155                                  ;---------- c32_expr ----------
+   156                                  ;  42: 		putchA('\r');
+   157                                  ;---------- call _putchA ----------
+   158 000000C4 6683EC04                	sub		esp, 0x4	;expr_function_call
+   159 000000C8 66B80D000000            	mov		eax, 0xd		;convert_com20
+   160 000000CE 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   161 000000D3 E8B6FF                  	call	_putchA		;expr_function_call
+   162 000000D6 6683C404                	add		esp, 0x4	;expr_function_call
+   163                                  ;---------- c32_expr end ------
+   164                                  ;  43: 	}
+   165 000000DA EB00                    	jmp		L2486
+   166                                  L2485:
+   167                                  L2486:
+   168                                  ;---------- parser_dainyuu ----------
+   169                                  ;---------- c32_expr ----------
+   170                                  ;  44: 	putchA(c);
+   171                                  ;---------- call _putchA ----------
+   172 000000DC 6683EC04                	sub		esp, 0x4	;expr_function_call
+   173 000000E0 678A4506                	mov		al, [ebp+_putch@_c]		;convert_com20
+   174 000000E4 98                      	cbw		;convert_com10
+   175 000000E5 66                      	db 0x66
+   176 000000E6 98                      	db 0x98		;convert_com10
+   177 000000E7 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   178 000000EC E89DFF                  	call	_putchA		;expr_function_call
+   179 000000EF 6683C404                	add		esp, 0x4	;expr_function_call
+   180                                  ;---------- c32_expr end ------
+   181                                  ;  45: }
+   182 000000F3 665D                    	pop		ebp
+   183 000000F5 C3                      	ret
+   184                                  ;  46: 
+   185                                  ;  47: void gets(char *str, int len)
+   186                                  _gets@_str	equ	10
+   187                                  _gets@_len	equ	14
+   188                                  _gets@_i	equ	0
+   189                                  ;---------- function _gets ----------
+   190                                  _gets:
+   191 000000F6 6655                    	push	ebp
+   192 000000F8 6683C4FC                	add		esp, -4		; auto variable
+   193 000000FC 6689E5                  	mov		ebp, esp
+   194                                  ;---------- parser_function_block ----------
+   195                                  ;  48: {
+   196                                  ;  49: 	int i;
+   197                                  ;---------- parser_for ----------
+   198                                  ;  50: 	
+   199                                  ;  51: 	for(i=0; i<len; i++){
+   200                                  ;---------- parser_dainyuu ----------
+   201                                  ;---------- c32_expr ----------
+   202 000000FF 66B800000000            	mov		eax, 0x0		;convert_com20
+   203 00000105 6667894500              	mov		[ebp+_gets@_i], eax	;expr_eq
+   204                                  ;---------- c32_expr end ------
+   205                                  L2532:
+   206                                  ;---------- c32_expr ----------
+   207 0000010A 66678B4500              	mov		eax, [ebp+_gets@_i]		;convert_com20
+   208 0000010F 6650                    	push	eax		;factor9
+   209 00000111 66678B450E              	mov		eax, [ebp+_gets@_len]		;convert_com20
+   210 00000116 665B                    	pop		ebx		;factor9
+   211 00000118 6639C3                  	cmp		ebx, eax	;factor9
+   212 0000011B 66B801000000            	mov		eax, 1	;factor9
+   213 00000121 7C02                    	jl		L2555		;factor9
+   214 00000123 6648                    	dec		eax		;factor9
+   215                                  L2555:		;factor8
+   216                                  ;---------- c32_expr end ------
+   217 00000125 6621C0                  	and		eax, eax
+   218 00000128 0F84D000                	jz		L2530
+   219 0000012C EB10                    	jmp		L2533
+   220                                  L2531:
+   221                                  ;---------- c32_expr ----------
+   222 0000012E 66678B5D00              	mov		ebx, [ebp+_gets@_i]		;factor13
+   223 00000133 666783450001            	add		dword	[ebp+_gets@_i], 0x1	;factor13
+   224 00000139 6689D8                  	mov		eax, ebx	;factor13
+   225                                  ;---------- c32_expr end ------
+   226 0000013C EBCC                    	jmp		L2532
+   227                                  L2533:
+   228                                  ;---------- parser_block ----------
+   229                                  ;---------- parser_function_block ----------
+   230                                  ;---------- parser_if ----------
+   231                                  ;  52: 		if((*str=getch())=='\n'){
+   232                                  ;---------- c32_expr ----------
+   233                                  ;---------- c32_expr ----------
+   234 0000013E 66678B450A              	mov		eax, [ebp+_gets@_str]		;convert_com20
+   235 00000143 6650                    	push	eax		;factor1
+   236                                  ;---------- call _getch ----------
+   237 00000145 E8CFFE                  	call	_getch		;expr_function_call
+   238 00000148 6689C3                  	mov		ebx, eax	;expr_eq
+   239 0000014B 6658                    	pop		eax		;expr_eq
+   240 0000014D 678818                  	mov		[eax], bl	;expr_eq
+   241                                  ;---------- c32_expr end ------
+   242 00000150 678A00                  	mov		al, [eax]		;convert_com20
+   243 00000153 98                      	cbw		;convert_com10
+   244 00000154 66                      	db 0x66
+   245 00000155 98                      	db 0x98		;convert_com10
+   246 00000156 6650                    	push	eax		;factor8
+   247 00000158 66B80A000000            	mov		eax, 0xa		;convert_com20
+   248 0000015E 665B                    	pop		ebx		;factor8
+   249 00000160 6639D8                  	cmp		eax, ebx	;factor8
+   250 00000163 66B801000000            	mov		eax, 1	;factor8-9
+   251 00000169 7402                    	jz		L2574		;factor8-10
+   252 0000016B 6648                    	dec		eax		;factor8-11
+   253                                  L2574:		;factor8
+   254                                  ;---------- c32_expr end ------
+   255 0000016D 6621C0                  	and		eax, eax
+   256 00000170 7434                    	jz		L2568
+   257                                  ;---------- parser_block ----------
+   258                                  ;---------- parser_function_block ----------
+   259                                  ;---------- parser_dainyuu ----------
+   260                                  ;---------- c32_expr ----------
+   261                                  ;  53: 			putch('\n');
+   262                                  ;---------- call _putch ----------
+   263 00000172 6683EC04                	sub		esp, 0x4	;expr_function_call
+   264 00000176 66B80A000000            	mov		eax, 0xa		;convert_com20
+   265 0000017C 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   266 00000181 E818FF                  	call	_putch		;expr_function_call
+   267 00000184 6683C404                	add		esp, 0x4	;expr_function_call
+   268                                  ;---------- c32_expr end ------
+   269                                  ;---------- parser_dainyuu ----------
+   270                                  ;---------- c32_expr ----------
+   271                                  ;  54: 			*str = 0;
+   272 00000188 66678B450A              	mov		eax, [ebp+_gets@_str]		;convert_com20
+   273 0000018D 6650                    	push	eax		;factor1
+   274 0000018F 66B800000000            	mov		eax, 0x0		;convert_com20
+   275 00000195 6689C3                  	mov		ebx, eax	;expr_eq
+   276 00000198 6658                    	pop		eax		;expr_eq
+   277 0000019A 678818                  	mov		[eax], bl	;expr_eq
+   278                                  ;---------- c32_expr end ------
+   279                                  ;----------  parser_return  ---------
+   280                                  ;  55: 			return;
+   281 0000019D 6683C404                	add		esp, 4		; auto variable clear
+   282 000001A1 665D                    	pop		ebp
+   283 000001A3 C3                      	ret
+   284                                  ;  56: 		}
+   285 000001A4 EB00                    	jmp		L2569
+   286                                  L2568:
+   287                                  L2569:
+   288                                  ;---------- parser_if ----------
+   289                                  ;  57: 		if(*str=='\b'){
+   290                                  ;---------- c32_expr ----------
+   291 000001A6 66678B450A              	mov		eax, [ebp+_gets@_str]		;convert_com20
+   292 000001AB 678A00                  	mov		al, [eax]		;convert_com20
+   293 000001AE 98                      	cbw		;convert_com10
+   294 000001AF 66                      	db 0x66
+   295 000001B0 98                      	db 0x98		;convert_com10
+   296 000001B1 6650                    	push	eax		;factor8
+   297 000001B3 66B808000000            	mov		eax, 0x8		;convert_com20
+   298 000001B9 665B                    	pop		ebx		;factor8
+   299 000001BB 6639D8                  	cmp		eax, ebx	;factor8
+   300 000001BE 66B801000000            	mov		eax, 1	;factor8-9
+   301 000001C4 7402                    	jz		L2639		;factor8-10
+   302 000001C6 6648                    	dec		eax		;factor8-11
+   303                                  L2639:		;factor8
+   304                                  ;---------- c32_expr end ------
+   305 000001C8 6621C0                  	and		eax, eax
+   306 000001CB 7426                    	jz		L2633
+   307                                  ;---------- parser_block ----------
+   308                                  ;---------- parser_function_block ----------
+   309                                  ;---------- parser_if ----------
+   310                                  ;  58: 			if(i){
+   311                                  ;---------- c32_expr ----------
+   312                                  ;---------- c32_expr end ------
+   313 000001CD 66678B4500              	mov		eax, [ebp+_gets@_i]		;convert_com20
+   314 000001D2 6621C0                  	and		eax, eax
+   315 000001D5 740E                    	jz		L2648
+   316                                  ;---------- parser_block ----------
+   317                                  ;---------- parser_function_block ----------
+   318                                  ;---------- parser_dainyuu ----------
+   319                                  ;---------- c32_expr ----------
+   320                                  ;  59: 				--i;
+   321 000001D7 6667836D0001            	sub		dword	[ebp+_gets@_i], 0x1	;factor13
+   322                                  ;---------- c32_expr end ------
+   323                                  ;---------- parser_dainyuu ----------
+   324                                  ;---------- c32_expr ----------
+   325                                  ;  60: 				--str;
+   326 000001DD 6667836D0A01            	sub		dword	[ebp+_gets@_str], 0x1	;factor13
+   327                                  ;---------- c32_expr end ------
+   328                                  ;  61: 			}
+   329 000001E3 EB00                    	jmp		L2649
+   330                                  L2648:
+   331                                  L2649:
+   332                                  ;---------- parser_dainyuu ----------
+   333                                  ;---------- c32_expr ----------
+   334                                  ;  62: 			--i;
+   335 000001E5 6667836D0001            	sub		dword	[ebp+_gets@_i], 0x1	;factor13
+   336                                  ;---------- c32_expr end ------
+   337                                  ;---------- parser_dainyuu ----------
+   338                                  ;---------- c32_expr ----------
+   339                                  ;  63: 			--str;
+   340 000001EB 6667836D0A01            	sub		dword	[ebp+_gets@_str], 0x1	;factor13
+   341                                  ;---------- c32_expr end ------
+   342                                  ;  64: 		}
+   343 000001F1 EB00                    	jmp		L2634
+   344                                  L2633:
+   345                                  L2634:
+   346                                  ;---------- parser_dainyuu ----------
+   347                                  ;---------- c32_expr ----------
+   348                                  ;  65: 		++str;
+   349 000001F3 666783450A01            	add		dword	[ebp+_gets@_str], 0x1	;factor13
+   350                                  ;---------- c32_expr end ------
+   351                                  ;  66: 	}
+   352 000001F9 E932FF                  	jmp		L2531
+   353                                  L2530:
+   354                                  ;  67: }
+   355 000001FC 6683C404                	add		esp, 4		; auto variable clear
+   356 00000200 665D                    	pop		ebp
+   357 00000202 C3                      	ret
+   358                                  ;  68: 
+   359                                  ;  69: void puts(char *str)
+   360                                  _puts@_str	equ	6
+   361                                  ;---------- function _puts ----------
+   362                                  _puts:
+   363 00000203 6655                    	push	ebp
+   364 00000205 6689E5                  	mov		ebp, esp
+   365                                  ;---------- parser_function_block ----------
+   366                                  ;  70: {
+   367                                  ;---------- parser_while ----------
+   368                                  ;  71: 	while(*str){
+   369                                  L2709:
+   370                                  ;---------- c32_expr ----------
+   371 00000208 66678B4506              	mov		eax, [ebp+_puts@_str]		;convert_com20
+   372                                  ;---------- c32_expr end ------
+   373 0000020D 678A00                  	mov		al, [eax]		;convert_com20
+   374 00000210 98                      	cbw		;convert_com10
+   375 00000211 66                      	db 0x66
+   376 00000212 98                      	db 0x98		;convert_com10
+   377 00000213 6621C0                  	and		eax, eax
+   378 00000216 7426                    	jz		L2708
+   379                                  L2710:
+   380                                  ;---------- parser_block ----------
+   381                                  ;---------- parser_function_block ----------
+   382                                  ;---------- parser_dainyuu ----------
+   383                                  ;---------- c32_expr ----------
+   384                                  ;  72: 		putch(*str++);
+   385                                  ;---------- call _putch ----------
+   386 00000218 6683EC04                	sub		esp, 0x4	;expr_function_call
+   387 0000021C 66678B5D06              	mov		ebx, [ebp+_puts@_str]		;factor13
+   388 00000221 666783450601            	add		dword	[ebp+_puts@_str], 0x1	;factor13
+   389 00000227 6689D8                  	mov		eax, ebx	;factor13
+   390 0000022A 678A00                  	mov		al, [eax]		;convert_com20
+   391 0000022D 98                      	cbw		;convert_com10
+   392 0000022E 66                      	db 0x66
+   393 0000022F 98                      	db 0x98		;convert_com10
+   394 00000230 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   395 00000235 E864FE                  	call	_putch		;expr_function_call
+   396 00000238 6683C404                	add		esp, 0x4	;expr_function_call
+   397                                  ;---------- c32_expr end ------
+   398                                  ;  73: 	}
+   399 0000023C EBCA                    	jmp		L2709
+   400                                  L2708:
+   401                                  ;  74: }
+   402 0000023E 665D                    	pop		ebp
+   403 00000240 C3                      	ret
+   404                                  ;  75: 
+   405                                  ;  76: void exit(char code)
+   406                                  _exit@_code	equ	6
+   407                                  ;---------- function _exit ----------
+   408                                  _exit:
+   409 00000241 6655                    	push	ebp
+   410 00000243 6689E5                  	mov		ebp, esp
+   411                                  ;---------- parser_function_block ----------
+   412                                  ;  77: {
+   413                                  ;---------- parser_asm ----------
+   414                                  ;  78: 	_asm{
+   415 00000246 678A4506                		mov		al,[ebp+_exit@_code]
+   416 0000024A B44C                    		mov		ah,0x4c
+   417 0000024C CD21                    		int		0x21
+   418                                  L2739:
+   419                                  ;  83: }
+   420 0000024E 665D                    	pop		ebp
+   421 00000250 C3                      	ret
+   422                                  ;  84: 
+   423                                  ;  85: void printf_1x(unsigned int d)
+   424                                  _printf_1x@_d	equ	6
+   425                                  ;---------- function _printf_1x ----------
+   426                                  _printf_1x:
+   427 00000251 6655                    	push	ebp
+   428 00000253 6689E5                  	mov		ebp, esp
+   429                                  ;---------- parser_function_block ----------
+   430                                  ;  86: {
+   431                                  ;---------- parser_dainyuu ----------
+   432                                  ;---------- c32_expr ----------
+   433                                  ;  87: 	d &= 0x0000000f;
+   434 00000256 66B80F000000            	mov		eax, 0xf		;convert_com20
+   435 0000025C 6667214506              	and		[ebp+_printf_1x@_d], eax	;expr_and_eq
+   436                                  ;---------- c32_expr end ------
+   437                                  ;---------- parser_if ----------
+   438                                  ;  88: 	if(d < 10){
+   439                                  ;---------- c32_expr ----------
+   440 00000261 66678B4506              	mov		eax, [ebp+_printf_1x@_d]		;convert_com20
+   441 00000266 6650                    	push	eax		;factor9
+   442 00000268 66B80A000000            	mov		eax, 0xa		;convert_com20
+   443 0000026E 665B                    	pop		ebx		;factor9
+   444 00000270 6639C3                  	cmp		ebx, eax	;factor9
+   445 00000273 66B801000000            	mov		eax, 1	;factor9
+   446 00000279 7202                    	jb		L2763		;factor9
+   447 0000027B 6648                    	dec		eax		;factor9
+   448                                  L2763:		;factor8
+   449                                  ;---------- c32_expr end ------
+   450 0000027D 6621C0                  	and		eax, eax
+   451 00000280 7423                    	jz		L2756
+   452                                  ;---------- parser_block ----------
+   453                                  ;---------- parser_function_block ----------
+   454                                  ;---------- parser_dainyuu ----------
+   455                                  ;---------- c32_expr ----------
+   456                                  ;  89: 		putch('0' + d);
+   457                                  ;---------- call _putch ----------
+   458 00000282 6683EC04                	sub		esp, 0x4	;expr_function_call
+   459 00000286 66678B4506              	mov		eax, [ebp+_printf_1x@_d]		;convert_com20
+   460 0000028B 6689C3                  	mov		ebx, eax	;factor11
+   461 0000028E 66B830000000            	mov		eax, 0x30		;convert_com20
+   462 00000294 6601D8                  	add		eax, ebx	;factor11
+   463 00000297 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   464 0000029C E8FDFD                  	call	_putch		;expr_function_call
+   465 0000029F 6683C404                	add		esp, 0x4	;expr_function_call
+   466                                  ;---------- c32_expr end ------
+   467                                  ;  90: 	}
+   468 000002A3 EB31                    	jmp		L2757
+   469                                  L2756:
+   470                                  ;  91: 	else{
+   471                                  ;---------- parser_block ----------
+   472                                  ;---------- parser_function_block ----------
+   473                                  ;---------- parser_dainyuu ----------
+   474                                  ;---------- c32_expr ----------
+   475                                  ;  92: 		putch('A' + d - 10);
+   476                                  ;---------- call _putch ----------
+   477 000002A5 6683EC04                	sub		esp, 0x4	;expr_function_call
+   478 000002A9 66678B4506              	mov		eax, [ebp+_printf_1x@_d]		;convert_com20
+   479 000002AE 6689C3                  	mov		ebx, eax	;factor11
+   480 000002B1 66B841000000            	mov		eax, 0x41		;convert_com20
+   481 000002B7 6601D8                  	add		eax, ebx	;factor11
+   482 000002BA 6650                    	push	eax		;factor11
+   483 000002BC 66B80A000000            	mov		eax, 0xa		;convert_com20
+   484 000002C2 665B                    	pop		ebx		;factor11
+   485 000002C4 6629C3                  	sub		ebx, eax	;factor11
+   486 000002C7 6689D8                  	mov		eax, ebx	;factor11
+   487 000002CA 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   488 000002CF E8CAFD                  	call	_putch		;expr_function_call
+   489 000002D2 6683C404                	add		esp, 0x4	;expr_function_call
+   490                                  ;---------- c32_expr end ------
+   491                                  ;  93: 	}
+   492                                  L2757:
+   493                                  ;  94: }
+   494 000002D6 665D                    	pop		ebp
+   495 000002D8 C3                      	ret
+   496                                  ;  95: 
+   497                                  ;  96: void printf_2x(unsigned int d)
+   498                                  _printf_2x@_d	equ	6
+   499                                  ;---------- function _printf_2x ----------
+   500                                  _printf_2x:
+   501 000002D9 6655                    	push	ebp
+   502 000002DB 6689E5                  	mov		ebp, esp
+   503                                  ;---------- parser_function_block ----------
+   504                                  ;  97: {
+   505                                  ;---------- parser_dainyuu ----------
+   506                                  ;---------- c32_expr ----------
+   507                                  ;  98: 	printf_1x(d/16 & 0xf);
+   508                                  ;---------- call _printf_1x ----------
+   509 000002DE 6683EC04                	sub		esp, 0x4	;expr_function_call
+   510 000002E2 66B810000000            	mov		eax, 0x10		;convert_com20
+   511 000002E8 6689C3                  	mov		ebx, eax	;factor12
+   512 000002EB 66678B4506              	mov		eax, [ebp+_printf_2x@_d]		;convert_com20
+   513 000002F0 6631D2                  	xor		edx, edx	;factor12
+   514 000002F3 66F7F3                  	div		ebx		;factor12
+   515 000002F6 6683E00F                	and		eax, 0xf	;factor7
+   516 000002FA 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   517 000002FF E84FFF                  	call	_printf_1x		;expr_function_call
+   518 00000302 6683C404                	add		esp, 0x4	;expr_function_call
+   519                                  ;---------- c32_expr end ------
+   520                                  ;---------- parser_dainyuu ----------
+   521                                  ;---------- c32_expr ----------
+   522                                  ;  99: 	printf_1x(d & 0xf);
+   523                                  ;---------- call _printf_1x ----------
+   524 00000306 6683EC04                	sub		esp, 0x4	;expr_function_call
+   525 0000030A 66B80F000000            	mov		eax, 0xf		;convert_com20
+   526 00000310 6689C3                  	mov		ebx, eax	;factor7
+   527 00000313 66678B4506              	mov		eax, [ebp+_printf_2x@_d]		;convert_com20
+   528 00000318 6621D8                  	and		eax, ebx	;factor7
+   529 0000031B 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   530 00000320 E82EFF                  	call	_printf_1x		;expr_function_call
+   531 00000323 6683C404                	add		esp, 0x4	;expr_function_call
+   532                                  ;---------- c32_expr end ------
+   533                                  ; 100: }
+   534 00000327 665D                    	pop		ebp
+   535 00000329 C3                      	ret
+   536                                  ; 101: 
+   537                                  ; 102: void printf_4x(unsigned int d)
+   538                                  _printf_4x@_d	equ	6
+   539                                  ;---------- function _printf_4x ----------
+   540                                  _printf_4x:
+   541 0000032A 6655                    	push	ebp
+   542 0000032C 6689E5                  	mov		ebp, esp
+   543                                  ;---------- parser_function_block ----------
+   544                                  ; 103: {
+   545                                  ;---------- parser_dainyuu ----------
+   546                                  ;---------- c32_expr ----------
+   547                                  ; 104: 	printf_2x(d/0x100 & 0xff);
+   548                                  ;---------- call _printf_2x ----------
+   549 0000032F 6683EC04                	sub		esp, 0x4	;expr_function_call
+   550 00000333 66B800010000            	mov		eax, 0x100		;convert_com20
+   551 00000339 6689C3                  	mov		ebx, eax	;factor12
+   552 0000033C 66678B4506              	mov		eax, [ebp+_printf_4x@_d]		;convert_com20
+   553 00000341 6631D2                  	xor		edx, edx	;factor12
+   554 00000344 66F7F3                  	div		ebx		;factor12
+   555 00000347 6625FF000000            	and		eax, 0xff	;factor7
+   556 0000034D 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   557 00000352 E884FF                  	call	_printf_2x		;expr_function_call
+   558 00000355 6683C404                	add		esp, 0x4	;expr_function_call
+   559                                  ;---------- c32_expr end ------
+   560                                  ;---------- parser_dainyuu ----------
+   561                                  ;---------- c32_expr ----------
+   562                                  ; 105: 	printf_2x(d & 0xff);
+   563                                  ;---------- call _printf_2x ----------
+   564 00000359 6683EC04                	sub		esp, 0x4	;expr_function_call
+   565 0000035D 66B8FF000000            	mov		eax, 0xff		;convert_com20
+   566 00000363 6689C3                  	mov		ebx, eax	;factor7
+   567 00000366 66678B4506              	mov		eax, [ebp+_printf_4x@_d]		;convert_com20
+   568 0000036B 6621D8                  	and		eax, ebx	;factor7
+   569 0000036E 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   570 00000373 E863FF                  	call	_printf_2x		;expr_function_call
+   571 00000376 6683C404                	add		esp, 0x4	;expr_function_call
+   572                                  ;---------- c32_expr end ------
+   573                                  ; 106: }
+   574 0000037A 665D                    	pop		ebp
+   575 0000037C C3                      	ret
+   576                                  ; 107: 
+   577                                  ; 108: void printf_8x(unsigned int d)
+   578                                  _printf_8x@_d	equ	6
+   579                                  ;---------- function _printf_8x ----------
+   580                                  _printf_8x:
+   581 0000037D 6655                    	push	ebp
+   582 0000037F 6689E5                  	mov		ebp, esp
+   583                                  ;---------- parser_function_block ----------
+   584                                  ; 109: {
+   585                                  ;---------- parser_dainyuu ----------
+   586                                  ;---------- c32_expr ----------
+   587                                  ; 110: 	printf_4x(d/0x10000 & 0xffff);
+   588                                  ;---------- call _printf_4x ----------
+   589 00000382 6683EC04                	sub		esp, 0x4	;expr_function_call
+   590 00000386 66B800000100            	mov		eax, 0x10000		;convert_com20
+   591 0000038C 6689C3                  	mov		ebx, eax	;factor12
+   592 0000038F 66678B4506              	mov		eax, [ebp+_printf_8x@_d]		;convert_com20
+   593 00000394 6631D2                  	xor		edx, edx	;factor12
+   594 00000397 66F7F3                  	div		ebx		;factor12
+   595 0000039A 6625FFFF0000            	and		eax, 0xffff	;factor7
+   596 000003A0 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   597 000003A5 E882FF                  	call	_printf_4x		;expr_function_call
+   598 000003A8 6683C404                	add		esp, 0x4	;expr_function_call
+   599                                  ;---------- c32_expr end ------
+   600                                  ;---------- parser_dainyuu ----------
+   601                                  ;---------- c32_expr ----------
+   602                                  ; 111: 	printf_4x(d & 0xffff);
+   603                                  ;---------- call _printf_4x ----------
+   604 000003AC 6683EC04                	sub		esp, 0x4	;expr_function_call
+   605 000003B0 66B8FFFF0000            	mov		eax, 0xffff		;convert_com20
+   606 000003B6 6689C3                  	mov		ebx, eax	;factor7
+   607 000003B9 66678B4506              	mov		eax, [ebp+_printf_8x@_d]		;convert_com20
+   608 000003BE 6621D8                  	and		eax, ebx	;factor7
+   609 000003C1 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   610 000003C6 E861FF                  	call	_printf_4x		;expr_function_call
+   611 000003C9 6683C404                	add		esp, 0x4	;expr_function_call
+   612                                  ;---------- c32_expr end ------
+   613                                  ; 112: }
+   614 000003CD 665D                    	pop		ebp
+   615 000003CF C3                      	ret
+   616                                  ; 113: 
+   617                                  ; 114: void printf_x(unsigned int d)
+   618                                  _printf_x@_d	equ	6
+   619                                  ;---------- function _printf_x ----------
+   620                                  _printf_x:
+   621 000003D0 6655                    	push	ebp
+   622 000003D2 6689E5                  	mov		ebp, esp
+   623                                  ;---------- parser_function_block ----------
+   624                                  ; 115: {
+   625                                  ;---------- parser_if ----------
+   626                                  ; 116: 	if(d / 16){
+   627                                  ;---------- c32_expr ----------
+   628 000003D5 66B810000000            	mov		eax, 0x10		;convert_com20
+   629 000003DB 6689C3                  	mov		ebx, eax	;factor12
+   630 000003DE 66678B4506              	mov		eax, [ebp+_printf_x@_d]		;convert_com20
+   631 000003E3 6631D2                  	xor		edx, edx	;factor12
+   632 000003E6 66F7F3                  	div		ebx		;factor12
+   633                                  ;---------- c32_expr end ------
+   634 000003E9 6621C0                  	and		eax, eax
+   635 000003EC 7426                    	jz		L2944
+   636                                  ;---------- parser_block ----------
+   637                                  ;---------- parser_function_block ----------
+   638                                  ;---------- parser_dainyuu ----------
+   639                                  ;---------- c32_expr ----------
+   640                                  ; 117: 		printf_x(d/16);
+   641                                  ;---------- call _printf_x ----------
+   642 000003EE 6683EC04                	sub		esp, 0x4	;expr_function_call
+   643 000003F2 66B810000000            	mov		eax, 0x10		;convert_com20
+   644 000003F8 6689C3                  	mov		ebx, eax	;factor12
+   645 000003FB 66678B4506              	mov		eax, [ebp+_printf_x@_d]		;convert_com20
+   646 00000400 6631D2                  	xor		edx, edx	;factor12
+   647 00000403 66F7F3                  	div		ebx		;factor12
+   648 00000406 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   649 0000040B E8C2FF                  	call	_printf_x		;expr_function_call
+   650 0000040E 6683C404                	add		esp, 0x4	;expr_function_call
+   651                                  ;---------- c32_expr end ------
+   652                                  ; 118: 	}
+   653 00000412 EB00                    	jmp		L2945
+   654                                  L2944:
+   655                                  L2945:
+   656                                  ;---------- parser_dainyuu ----------
+   657                                  ;---------- c32_expr ----------
+   658                                  ; 119: 	printf_1x(d);
+   659                                  ;---------- call _printf_1x ----------
+   660 00000414 6683EC04                	sub		esp, 0x4	;expr_function_call
+   661 00000418 66678B4506              	mov		eax, [ebp+_printf_x@_d]		;convert_com20
+   662 0000041D 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   663 00000422 E82CFE                  	call	_printf_1x		;expr_function_call
+   664 00000425 6683C404                	add		esp, 0x4	;expr_function_call
+   665                                  ;---------- c32_expr end ------
+   666                                  ; 120: }
+   667 00000429 665D                    	pop		ebp
+   668 0000042B C3                      	ret
+   669                                  ; 121: 
+   670                                  ; 122: void printf_u(unsigned int d)
+   671                                  _printf_u@_d	equ	6
+   672                                  ;---------- function _printf_u ----------
+   673                                  _printf_u:
+   674 0000042C 6655                    	push	ebp
+   675 0000042E 6689E5                  	mov		ebp, esp
+   676                                  ;---------- parser_function_block ----------
+   677                                  ; 123: {
+   678                                  ;---------- parser_if ----------
+   679                                  ; 124: 	
+   680                                  ; 125: 	if(d / 10){
+   681                                  ;---------- c32_expr ----------
+   682 00000431 66B80A000000            	mov		eax, 0xa		;convert_com20
+   683 00000437 6689C3                  	mov		ebx, eax	;factor12
+   684 0000043A 66678B4506              	mov		eax, [ebp+_printf_u@_d]		;convert_com20
+   685 0000043F 6631D2                  	xor		edx, edx	;factor12
+   686 00000442 66F7F3                  	div		ebx		;factor12
+   687                                  ;---------- c32_expr end ------
+   688 00000445 6621C0                  	and		eax, eax
+   689 00000448 7426                    	jz		L2990
+   690                                  ;---------- parser_block ----------
+   691                                  ;---------- parser_function_block ----------
+   692                                  ;---------- parser_dainyuu ----------
+   693                                  ;---------- c32_expr ----------
+   694                                  ; 126: 		printf_u(d / 10);
+   695                                  ;---------- call _printf_u ----------
+   696 0000044A 6683EC04                	sub		esp, 0x4	;expr_function_call
+   697 0000044E 66B80A000000            	mov		eax, 0xa		;convert_com20
+   698 00000454 6689C3                  	mov		ebx, eax	;factor12
+   699 00000457 66678B4506              	mov		eax, [ebp+_printf_u@_d]		;convert_com20
+   700 0000045C 6631D2                  	xor		edx, edx	;factor12
+   701 0000045F 66F7F3                  	div		ebx		;factor12
+   702 00000462 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   703 00000467 E8C2FF                  	call	_printf_u		;expr_function_call
+   704 0000046A 6683C404                	add		esp, 0x4	;expr_function_call
+   705                                  ;---------- c32_expr end ------
+   706                                  ; 127: 	}
+   707 0000046E EB00                    	jmp		L2991
+   708                                  L2990:
+   709                                  L2991:
+   710                                  ;---------- parser_dainyuu ----------
+   711                                  ;---------- c32_expr ----------
+   712                                  ; 128: 	putch('0' + d%10);
+   713                                  ;---------- call _putch ----------
+   714 00000470 6683EC04                	sub		esp, 0x4	;expr_function_call
+   715 00000474 66B80A000000            	mov		eax, 0xa		;convert_com20
+   716 0000047A 6689C3                  	mov		ebx, eax	;factor12
+   717 0000047D 66678B4506              	mov		eax, [ebp+_printf_u@_d]		;convert_com20
+   718 00000482 6631D2                  	xor		edx, edx	;factor12
+   719 00000485 66F7F3                  	div		ebx		;factor12
+   720 00000488 6689D0                  	mov		eax, edx	;factor12
+   721 0000048B 6689C3                  	mov		ebx, eax	;factor11
+   722 0000048E 66B830000000            	mov		eax, 0x30		;convert_com20
+   723 00000494 6601D8                  	add		eax, ebx	;factor11
+   724 00000497 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   725 0000049C E8FDFB                  	call	_putch		;expr_function_call
+   726 0000049F 6683C404                	add		esp, 0x4	;expr_function_call
+   727                                  ;---------- c32_expr end ------
+   728                                  ; 129: }
+   729 000004A3 665D                    	pop		ebp
+   730 000004A5 C3                      	ret
+   731                                  ; 130: 
+   732                                  ; 131: void printf_d(int d)
+   733                                  _printf_d@_d	equ	6
+   734                                  ;---------- function _printf_d ----------
+   735                                  _printf_d:
+   736 000004A6 6655                    	push	ebp
+   737 000004A8 6689E5                  	mov		ebp, esp
+   738                                  ;---------- parser_function_block ----------
+   739                                  ; 132: {
+   740                                  ;---------- parser_if ----------
+   741                                  ; 133: 	if(d < 0){
+   742                                  ;---------- c32_expr ----------
+   743 000004AB 66678B4506              	mov		eax, [ebp+_printf_d@_d]		;convert_com20
+   744 000004B0 6650                    	push	eax		;factor9
+   745 000004B2 66B800000000            	mov		eax, 0x0		;convert_com20
+   746 000004B8 665B                    	pop		ebx		;factor9
+   747 000004BA 6639C3                  	cmp		ebx, eax	;factor9
+   748 000004BD 66B801000000            	mov		eax, 1	;factor9
+   749 000004C3 7C02                    	jl		L3047		;factor9
+   750 000004C5 6648                    	dec		eax		;factor9
+   751                                  L3047:		;factor8
+   752                                  ;---------- c32_expr end ------
+   753 000004C7 6621C0                  	and		eax, eax
+   754 000004CA 7425                    	jz		L3040
+   755                                  ;---------- parser_block ----------
+   756                                  ;---------- parser_function_block ----------
+   757                                  ;---------- parser_dainyuu ----------
+   758                                  ;---------- c32_expr ----------
+   759                                  ; 134: 		putch('-');
+   760                                  ;---------- call _putch ----------
+   761 000004CC 6683EC04                	sub		esp, 0x4	;expr_function_call
+   762 000004D0 66B82D000000            	mov		eax, 0x2d		;convert_com20
+   763 000004D6 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   764 000004DB E8BEFB                  	call	_putch		;expr_function_call
+   765 000004DE 6683C404                	add		esp, 0x4	;expr_function_call
+   766                                  ;---------- c32_expr end ------
+   767                                  ;---------- parser_dainyuu ----------
+   768                                  ;---------- c32_expr ----------
+   769                                  ; 135: 		d = -d;
+   770 000004E2 66678B4506              	mov		eax, [ebp+_printf_d@_d]		;convert_com20
+   771 000004E7 66F7D8                  	neg	 	eax		;factor13
+   772 000004EA 6667894506              	mov		[ebp+_printf_d@_d], eax	;expr_eq
+   773                                  ;---------- c32_expr end ------
+   774                                  ; 136: 	}
+   775 000004EF EB00                    	jmp		L3041
+   776                                  L3040:
+   777                                  L3041:
+   778                                  ;---------- parser_dainyuu ----------
+   779                                  ;---------- c32_expr ----------
+   780                                  ; 137: 	printf_u(d);
+   781                                  ;---------- call _printf_u ----------
+   782 000004F1 6683EC04                	sub		esp, 0x4	;expr_function_call
+   783 000004F5 66678B4506              	mov		eax, [ebp+_printf_d@_d]		;convert_com20
+   784 000004FA 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+   785 000004FF E82AFF                  	call	_printf_u		;expr_function_call
+   786 00000502 6683C404                	add		esp, 0x4	;expr_function_call
+   787                                  ;---------- c32_expr end ------
+   788                                  ; 138: }
+   789 00000506 665D                    	pop		ebp
+   790 00000508 C3                      	ret
+   791                                  ; 139: 
+   792                                  ; 140: int memcmp(void *dst, void *src, unsigned int size)
+   793                                  _memcmp@_dst	equ	22
+   794                                  _memcmp@_src	equ	26
+   795                                  _memcmp@_size	equ	30
+   796                                  _memcmp@_dst1	equ	0
+   797                                  _memcmp@_src1	equ	4
+   798                                  _memcmp@_i	equ	8
+   799                                  _memcmp@_tmp	equ	12
+   800                                  ;---------- function _memcmp ----------
+   801                                  _memcmp:
+   802 00000509 6655                    	push	ebp
+   803 0000050B 6683C4F0                	add		esp, -16		; auto variable
+   804 0000050F 6689E5                  	mov		ebp, esp
+   805                                  ;---------- parser_function_block ----------
+   806                                  ; 141: {
+   807                                  ; 142: 	int i;
+   808                                  ; 143: 	int tmp;
+   809                                  ; 144: 	unsigned char *dst1;
+   810                                  ; 145: 	unsigned char *src1;
+   811                                  ;---------- parser_dainyuu ----------
+   812                                  ;---------- c32_expr ----------
+   813                                  ; 146: 	
+   814                                  ; 147: 	dst1 = (unsigned char *)dst;
+   815 00000512 66678B4516              	mov		eax, [ebp+_memcmp@_dst]		;convert_com20
+   816 00000517 6689C3                  	mov		ebx, eax	;factor13
+   817 0000051A 6631C0                  	xor		eax, eax	;factor13
+   818 0000051D 6689D8                  	mov		eax, ebx	;factor13
+   819 00000520 6667894500              	mov		[ebp+_memcmp@_dst1], eax	;expr_eq
+   820                                  ;---------- c32_expr end ------
+   821                                  ;---------- parser_dainyuu ----------
+   822                                  ;---------- c32_expr ----------
+   823                                  ; 148: 	src1 = (unsigned char *)src;
+   824 00000525 66678B451A              	mov		eax, [ebp+_memcmp@_src]		;convert_com20
+   825 0000052A 6689C3                  	mov		ebx, eax	;factor13
+   826 0000052D 6631C0                  	xor		eax, eax	;factor13
+   827 00000530 6689D8                  	mov		eax, ebx	;factor13
+   828 00000533 6667894504              	mov		[ebp+_memcmp@_src1], eax	;expr_eq
+   829                                  ;---------- c32_expr end ------
+   830                                  ;---------- parser_for ----------
+   831                                  ; 149: 	for(i=0; i<size; ++i){
+   832                                  ;---------- parser_dainyuu ----------
+   833                                  ;---------- c32_expr ----------
+   834 00000538 66B800000000            	mov		eax, 0x0		;convert_com20
+   835 0000053E 6667894508              	mov		[ebp+_memcmp@_i], eax	;expr_eq
+   836                                  ;---------- c32_expr end ------
+   837                                  L3140:
+   838                                  ;---------- c32_expr ----------
+   839 00000543 66678B4508              	mov		eax, [ebp+_memcmp@_i]		;convert_com20
+   840 00000548 6650                    	push	eax		;factor9
+   841 0000054A 66678B451E              	mov		eax, [ebp+_memcmp@_size]		;convert_com20
+   842 0000054F 665B                    	pop		ebx		;factor9
+   843 00000551 6639C3                  	cmp		ebx, eax	;factor9
+   844 00000554 66B801000000            	mov		eax, 1	;factor9
+   845 0000055A 7C02                    	jl		L3163		;factor9
+   846 0000055C 6648                    	dec		eax		;factor9
+   847                                  L3163:		;factor8
+   848                                  ;---------- c32_expr end ------
+   849 0000055E 6621C0                  	and		eax, eax
+   850 00000561 747E                    	jz		L3138
+   851 00000563 EB0D                    	jmp		L3141
+   852                                  L3139:
+   853                                  ;---------- c32_expr ----------
+   854 00000565 666783450801            	add		dword	[ebp+_memcmp@_i], 0x1	;factor13
+   855                                  ;---------- c32_expr end ------
+   856 0000056B 66678B4508              	mov		eax, [ebp+_memcmp@_i]		;convert_com20
+   857 00000570 EBD1                    	jmp		L3140
+   858                                  L3141:
+   859                                  ;---------- parser_block ----------
+   860                                  ;---------- parser_function_block ----------
+   861                                  ;---------- parser_if ----------
+   862                                  ; 150: 		if((tmp = dst1[i]-src1[i])){
+   863                                  ;---------- c32_expr ----------
+   864                                  ;---------- c32_expr ----------
+   865 00000572 66678B4500              	mov		eax, [ebp+_memcmp@_dst1]		;convert_com20
+   866 00000577 6650                    	push	eax		;factor15
+   867                                  ;---------- c32_expr ----------
+   868                                  ;---------- c32_expr end ------
+   869 00000579 66678B4508              	mov		eax, [ebp+_memcmp@_i]		;convert_com20
+   870 0000057E 66BB01000000            	mov		ebx, 0x1	;factor15
+   871 00000584 66F7E3                  	mul		ebx		;factor15
+   872 00000587 665B                    	pop		ebx		;factor15
+   873 00000589 6601D8                  	add		eax, ebx	;factor15
+   874 0000058C 6629DB                  	sub		ebx, ebx	;convert_com20
+   875 0000058F 678A18                  	mov		bl, [eax]		;convert_com20
+   876 00000592 6689D8                  	mov		eax, ebx	;convert_com20
+   877 00000595 6650                    	push	eax		;factor11
+   878 00000597 66678B4504              	mov		eax, [ebp+_memcmp@_src1]		;convert_com20
+   879 0000059C 6650                    	push	eax		;factor15
+   880                                  ;---------- c32_expr ----------
+   881                                  ;---------- c32_expr end ------
+   882 0000059E 66678B4508              	mov		eax, [ebp+_memcmp@_i]		;convert_com20
+   883 000005A3 66BB01000000            	mov		ebx, 0x1	;factor15
+   884 000005A9 66F7E3                  	mul		ebx		;factor15
+   885 000005AC 665B                    	pop		ebx		;factor15
+   886 000005AE 6601D8                  	add		eax, ebx	;factor15
+   887 000005B1 6629DB                  	sub		ebx, ebx	;convert_com20
+   888 000005B4 678A18                  	mov		bl, [eax]		;convert_com20
+   889 000005B7 6689D8                  	mov		eax, ebx	;convert_com20
+   890 000005BA 665B                    	pop		ebx		;factor11
+   891 000005BC 6629C3                  	sub		ebx, eax	;factor11
+   892 000005BF 6689D8                  	mov		eax, ebx	;factor11
+   893 000005C2 666789450C              	mov		[ebp+_memcmp@_tmp], eax	;expr_eq
+   894                                  ;---------- c32_expr end ------
+   895                                  ;---------- c32_expr end ------
+   896 000005C7 66678B450C              	mov		eax, [ebp+_memcmp@_tmp]		;convert_com20
+   897 000005CC 6621C0                  	and		eax, eax
+   898 000005CF 740E                    	jz		L3178
+   899                                  ;---------- parser_block ----------
+   900                                  ;---------- parser_function_block ----------
+   901                                  ;----------  parser_return  ---------
+   902                                  ; 151: 			return tmp;
+   903                                  ;---------- c32_expr ----------
+   904                                  ;---------- c32_expr end ------
+   905 000005D1 66678B450C              	mov		eax, [ebp+_memcmp@_tmp]		;convert_com20
+   906 000005D6 6683C410                	add		esp, 16		; auto variable clear
+   907 000005DA 665D                    	pop		ebp
+   908 000005DC C3                      	ret
+   909                                  ; 152: 		}
+   910 000005DD EB00                    	jmp		L3179
+   911                                  L3178:
+   912                                  L3179:
+   913                                  ; 153: 	}
+   914 000005DF EB84                    	jmp		L3139
+   915                                  L3138:
+   916                                  ;----------  parser_return  ---------
+   917                                  ; 154: 	return 0;
+   918                                  ;---------- c32_expr ----------
+   919                                  ;---------- c32_expr end ------
+   920 000005E1 66B800000000            	mov		eax, 0x0		;convert_com20
+   921 000005E7 6683C410                	add		esp, 16		; auto variable clear
+   922 000005EB 665D                    	pop		ebp
+   923 000005ED C3                      	ret
+   924                                  ; 155: }
+   925 000005EE 6683C410                	add		esp, 16		; auto variable clear
+   926 000005F2 665D                    	pop		ebp
+   927 000005F4 C3                      	ret
+   928                                  ; 156: 
+   929                                  ; 157: int strcmp(char *dst, char *src)
+   930                                  _strcmp@_dst	equ	14
+   931                                  _strcmp@_src	equ	18
+   932                                  _strcmp@_i	equ	0
+   933                                  _strcmp@_tmp	equ	4
+   934                                  ;---------- function _strcmp ----------
+   935                                  _strcmp:
+   936 000005F5 6655                    	push	ebp
+   937 000005F7 6683C4F8                	add		esp, -8		; auto variable
+   938 000005FB 6689E5                  	mov		ebp, esp
+   939                                  ;---------- parser_function_block ----------
+   940                                  ; 158: {
+   941                                  ; 159: 	int i;
+   942                                  ; 160: 	int tmp;
+   943                                  ;---------- parser_for ----------
+   944                                  ; 161: 	
+   945                                  ; 162: 	for(i=0; ; ++i){
+   946                                  ;---------- parser_dainyuu ----------
+   947                                  ;---------- c32_expr ----------
+   948 000005FE 66B800000000            	mov		eax, 0x0		;convert_com20
+   949 00000604 6667894500              	mov		[ebp+_strcmp@_i], eax	;expr_eq
+   950                                  ;---------- c32_expr end ------
+   951                                  L3240:
+   952 00000609 EB0D                    	jmp		L3241
+   953                                  L3239:
+   954                                  ;---------- c32_expr ----------
+   955 0000060B 666783450001            	add		dword	[ebp+_strcmp@_i], 0x1	;factor13
+   956                                  ;---------- c32_expr end ------
+   957 00000611 66678B4500              	mov		eax, [ebp+_strcmp@_i]		;convert_com20
+   958 00000616 EBF1                    	jmp		L3240
+   959                                  L3241:
+   960                                  ;---------- parser_block ----------
+   961                                  ;---------- parser_function_block ----------
+   962                                  ;---------- parser_if ----------
+   963                                  ; 163: 		if((tmp = (unsigned char)dst[i]-(unsigned char)src[i]))
+   964                                  ;---------- c32_expr ----------
+   965                                  ;---------- c32_expr ----------
+   966 00000618 66678B450E              	mov		eax, [ebp+_strcmp@_dst]		;convert_com20
+   967 0000061D 6650                    	push	eax		;factor15
+   968                                  ;---------- c32_expr ----------
+   969                                  ;---------- c32_expr end ------
+   970 0000061F 66678B4500              	mov		eax, [ebp+_strcmp@_i]		;convert_com20
+   971 00000624 66BB01000000            	mov		ebx, 0x1	;factor15
+   972 0000062A 66F7E3                  	mul		ebx		;factor15
+   973 0000062D 665B                    	pop		ebx		;factor15
+   974 0000062F 6601D8                  	add		eax, ebx	;factor15
+   975 00000632 678A00                  	mov		al, [eax]		;convert_com20
+   976 00000635 98                      	cbw		;convert_com10
+   977 00000636 66                      	db 0x66
+   978 00000637 98                      	db 0x98		;convert_com10
+   979 00000638 6689C3                  	mov		ebx, eax	;factor13
+   980 0000063B 6631C0                  	xor		eax, eax	;factor13
+   981 0000063E 88D8                    	mov		al, bl	;factor13
+   982 00000640 6650                    	push	eax		;factor11
+   983 00000642 66678B4512              	mov		eax, [ebp+_strcmp@_src]		;convert_com20
+   984 00000647 6650                    	push	eax		;factor15
+   985                                  ;---------- c32_expr ----------
+   986                                  ;---------- c32_expr end ------
+   987 00000649 66678B4500              	mov		eax, [ebp+_strcmp@_i]		;convert_com20
+   988 0000064E 66BB01000000            	mov		ebx, 0x1	;factor15
+   989 00000654 66F7E3                  	mul		ebx		;factor15
+   990 00000657 665B                    	pop		ebx		;factor15
+   991 00000659 6601D8                  	add		eax, ebx	;factor15
+   992 0000065C 678A00                  	mov		al, [eax]		;convert_com20
+   993 0000065F 98                      	cbw		;convert_com10
+   994 00000660 66                      	db 0x66
+   995 00000661 98                      	db 0x98		;convert_com10
+   996 00000662 6689C3                  	mov		ebx, eax	;factor13
+   997 00000665 6631C0                  	xor		eax, eax	;factor13
+   998 00000668 88D8                    	mov		al, bl	;factor13
+   999 0000066A 665B                    	pop		ebx		;factor11
+  1000 0000066C 6629C3                  	sub		ebx, eax	;factor11
+  1001 0000066F 6689D8                  	mov		eax, ebx	;factor11
+  1002 00000672 6667894504              	mov		[ebp+_strcmp@_tmp], eax	;expr_eq
+  1003                                  ;---------- c32_expr end ------
+  1004                                  ;---------- c32_expr end ------
+  1005 00000677 66678B4504              	mov		eax, [ebp+_strcmp@_tmp]		;convert_com20
+  1006 0000067C 6621C0                  	and		eax, eax
+  1007 0000067F 740E                    	jz		L3268
+  1008                                  ;---------- parser_block ----------
+  1009                                  ;----------  parser_return  ---------
+  1010                                  ; 164: 			return tmp;
+  1011                                  ;---------- c32_expr ----------
+  1012                                  ;---------- c32_expr end ------
+  1013 00000681 66678B4504              	mov		eax, [ebp+_strcmp@_tmp]		;convert_com20
+  1014 00000686 6683C408                	add		esp, 8		; auto variable clear
+  1015 0000068A 665D                    	pop		ebp
+  1016 0000068C C3                      	ret
+  1017 0000068D EB00                    	jmp		L3269
+  1018                                  L3268:
+  1019                                  L3269:
+  1020                                  ;---------- parser_if ----------
+  1021                                  ; 165: 		if(src[i]==0)
+  1022                                  ;---------- c32_expr ----------
+  1023 0000068F 66678B4512              	mov		eax, [ebp+_strcmp@_src]		;convert_com20
+  1024 00000694 6650                    	push	eax		;factor15
+  1025                                  ;---------- c32_expr ----------
+  1026                                  ;---------- c32_expr end ------
+  1027 00000696 66678B4500              	mov		eax, [ebp+_strcmp@_i]		;convert_com20
+  1028 0000069B 66BB01000000            	mov		ebx, 0x1	;factor15
+  1029 000006A1 66F7E3                  	mul		ebx		;factor15
+  1030 000006A4 665B                    	pop		ebx		;factor15
+  1031 000006A6 6601D8                  	add		eax, ebx	;factor15
+  1032 000006A9 678A00                  	mov		al, [eax]		;convert_com20
+  1033 000006AC 98                      	cbw		;convert_com10
+  1034 000006AD 66                      	db 0x66
+  1035 000006AE 98                      	db 0x98		;convert_com10
+  1036 000006AF 6650                    	push	eax		;factor8
+  1037 000006B1 66B800000000            	mov		eax, 0x0		;convert_com20
+  1038 000006B7 665B                    	pop		ebx		;factor8
+  1039 000006B9 6639D8                  	cmp		eax, ebx	;factor8
+  1040 000006BC 66B801000000            	mov		eax, 1	;factor8-9
+  1041 000006C2 7402                    	jz		L3330		;factor8-10
+  1042 000006C4 6648                    	dec		eax		;factor8-11
+  1043                                  L3330:		;factor8
+  1044                                  ;---------- c32_expr end ------
+  1045 000006C6 6621C0                  	and		eax, eax
+  1046 000006C9 740F                    	jz		L3324
+  1047                                  ;---------- parser_block ----------
+  1048                                  ;----------  parser_return  ---------
+  1049                                  ; 166: 			return 0;
+  1050                                  ;---------- c32_expr ----------
+  1051                                  ;---------- c32_expr end ------
+  1052 000006CB 66B800000000            	mov		eax, 0x0		;convert_com20
+  1053 000006D1 6683C408                	add		esp, 8		; auto variable clear
+  1054 000006D5 665D                    	pop		ebp
+  1055 000006D7 C3                      	ret
+  1056 000006D8 EB00                    	jmp		L3325
+  1057                                  L3324:
+  1058                                  L3325:
+  1059                                  ; 167: 	}
+  1060 000006DA E92EFF                  	jmp		L3239
+  1061                                  L3238:
+  1062                                  ; 168: }
+  1063 000006DD 6683C408                	add		esp, 8		; auto variable clear
+  1064 000006E1 665D                    	pop		ebp
+  1065 000006E3 C3                      	ret
+  1066                                  ;   0:   /*#$& test3.c */
+  1067                                  ;   2: 
+  1068                                  ;   4: 
+  1069                                  ;   5: 
+  1070                                  ;   6: char symbuf[64];
+  1071                                  ;---------- c32_expr ----------
+  1072                                  ;---------- c32_expr end ------
+  1073 000006E4 <res 40h>               _symbuf:	resb	0x40	;parser_global_array
+  1073          ******************       warning: uninitialized space declared in .text section: zeroing [-w+zeroing]
+  1074                                  ;   7: char *linebufp;
+  1075 00000724 ????????                _linebufp:	resb	0x4
+  1075          ******************       warning: uninitialized space declared in .text section: zeroing [-w+zeroing]
+  1076                                  ;   8: 
+  1077                                  ;   9: 
+  1078                                  ;  10: int getnum(char *str)
+  1079                                  _getnum@_str	equ	14
+  1080                                  _getnum@_numb	equ	0
+  1081                                  _getnum@_neg	equ	4
+  1082                                  ;---------- function _getnum ----------
+  1083                                  _getnum:
+  1084 00000728 6655                    	push	ebp
+  1085 0000072A 6683C4F8                	add		esp, -8		; auto variable
+  1086 0000072E 6689E5                  	mov		ebp, esp
+  1087                                  ;---------- parser_function_block ----------
+  1088                                  ;  11: {
+  1089                                  ;  12: 	int numb, neg;
+  1090                                  ;---------- parser_dainyuu ----------
+  1091                                  ;---------- c32_expr ----------
+  1092                                  ;  13: 	
+  1093                                  ;  14: 	numb = 0;
+  1094 00000731 66B800000000            	mov		eax, 0x0		;convert_com20
+  1095 00000737 6667894500              	mov		[ebp+_getnum@_numb], eax	;expr_eq
+  1096                                  ;---------- c32_expr end ------
+  1097                                  ;---------- parser_if ----------
+  1098                                  ;  15: 	if(*str=='-'){
+  1099                                  ;---------- c32_expr ----------
+  1100 0000073C 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1101 00000741 678A00                  	mov		al, [eax]		;convert_com20
+  1102 00000744 98                      	cbw		;convert_com10
+  1103 00000745 66                      	db 0x66
+  1104 00000746 98                      	db 0x98		;convert_com10
+  1105 00000747 6650                    	push	eax		;factor8
+  1106 00000749 66B82D000000            	mov		eax, 0x2d		;convert_com20
+  1107 0000074F 665B                    	pop		ebx		;factor8
+  1108 00000751 6639D8                  	cmp		eax, ebx	;factor8
+  1109 00000754 66B801000000            	mov		eax, 1	;factor8-9
+  1110 0000075A 7402                    	jz		L3383		;factor8-10
+  1111 0000075C 6648                    	dec		eax		;factor8-11
+  1112                                  L3383:		;factor8
+  1113                                  ;---------- c32_expr end ------
+  1114 0000075E 6621C0                  	and		eax, eax
+  1115 00000761 7413                    	jz		L3377
+  1116                                  ;---------- parser_block ----------
+  1117                                  ;---------- parser_function_block ----------
+  1118                                  ;---------- parser_dainyuu ----------
+  1119                                  ;---------- c32_expr ----------
+  1120                                  ;  16: 		neg = -1;
+  1121 00000763 66B8FFFFFFFF            	mov		eax, 0xffffffff		;convert_com20
+  1122 00000769 6667894504              	mov		[ebp+_getnum@_neg], eax	;expr_eq
+  1123                                  ;---------- c32_expr end ------
+  1124                                  ;---------- parser_dainyuu ----------
+  1125                                  ;---------- c32_expr ----------
+  1126                                  ;  17: 		++str;
+  1127 0000076E 666783450E01            	add		dword	[ebp+_getnum@_str], 0x1	;factor13
+  1128                                  ;---------- c32_expr end ------
+  1129                                  ;  18: 	}
+  1130 00000774 EB0B                    	jmp		L3378
+  1131                                  L3377:
+  1132                                  ;  19: 	else{
+  1133                                  ;---------- parser_block ----------
+  1134                                  ;---------- parser_function_block ----------
+  1135                                  ;---------- parser_dainyuu ----------
+  1136                                  ;---------- c32_expr ----------
+  1137                                  ;  20: 		neg = 1;
+  1138 00000776 66B801000000            	mov		eax, 0x1		;convert_com20
+  1139 0000077C 6667894504              	mov		[ebp+_getnum@_neg], eax	;expr_eq
+  1140                                  ;---------- c32_expr end ------
+  1141                                  ;  21: 	}
+  1142                                  L3378:
+  1143                                  ;---------- parser_if ----------
+  1144                                  ;  22: 	if(memcmp(str, "0x", 2)==0){	// 0x ...
+  1145                                  ;---------- c32_expr ----------
+  1146                                  ;---------- call _memcmp ----------
+  1147 00000781 6683EC0C                	sub		esp, 0xc	;expr_function_call
+  1148 00000785 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1149 0000078A 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  1150 0000078F EB03                    	jmp		L3463
+  1151                                  L3462:
+  1152 00000791 30                      	db		0x30
+  1153 00000792 78                      	db		0x78
+  1154 00000793 00                      	db		0x0
+  1155                                  L3463:
+  1156 00000794 66B8[91070000]          	mov		eax, L3462		;convert_com20
+  1157 0000079A 666789442404            	mov		[esp+0x4], eax		;expr_function_call
+  1158 000007A0 66B802000000            	mov		eax, 0x2		;convert_com20
+  1159 000007A6 666789442408            	mov		[esp+0x8], eax		;expr_function_call
+  1160 000007AC E85AFD                  	call	_memcmp		;expr_function_call
+  1161 000007AF 6683C40C                	add		esp, 0xc	;expr_function_call
+  1162 000007B3 6650                    	push	eax		;factor8
+  1163 000007B5 66B800000000            	mov		eax, 0x0		;convert_com20
+  1164 000007BB 665B                    	pop		ebx		;factor8
+  1165 000007BD 6639D8                  	cmp		eax, ebx	;factor8
+  1166 000007C0 66B801000000            	mov		eax, 1	;factor8-9
+  1167 000007C6 7402                    	jz		L3442		;factor8-10
+  1168 000007C8 6648                    	dec		eax		;factor8-11
+  1169                                  L3442:		;factor8
+  1170                                  ;---------- c32_expr end ------
+  1171 000007CA 6621C0                  	and		eax, eax
+  1172 000007CD 0F84EE01                	jz		L3436
+  1173                                  ;---------- parser_block ----------
+  1174                                  ;---------- parser_function_block ----------
+  1175                                  ;---------- parser_dainyuu ----------
+  1176                                  ;---------- c32_expr ----------
+  1177                                  ;  23: 		str += 2;
+  1178 000007D1 66B802000000            	mov		eax, 0x2		;convert_com20
+  1179 000007D7 666701450E              	add		[ebp+_getnum@_str], eax	;expr_plus_eq
+  1180                                  ;---------- c32_expr end ------
+  1181                                  ;---------- parser_for ----------
+  1182                                  ;  24: 		for(;;){
+  1183                                  L3493:
+  1184 000007DC EB02                    	jmp		L3494
+  1185                                  L3492:
+  1186 000007DE EBFC                    	jmp		L3493
+  1187                                  L3494:
+  1188                                  ;---------- parser_block ----------
+  1189                                  ;---------- parser_function_block ----------
+  1190                                  ;---------- parser_if ----------
+  1191                                  ;  25: 			if(*str>='0' && *str<='9'){
+  1192                                  ;---------- c32_expr ----------
+  1193 000007E0 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1194 000007E5 678A00                  	mov		al, [eax]		;convert_com20
+  1195 000007E8 98                      	cbw		;convert_com10
+  1196 000007E9 66                      	db 0x66
+  1197 000007EA 98                      	db 0x98		;convert_com10
+  1198 000007EB 6650                    	push	eax		;factor9
+  1199 000007ED 66B830000000            	mov		eax, 0x30		;convert_com20
+  1200 000007F3 665B                    	pop		ebx		;factor9
+  1201 000007F5 6639C3                  	cmp		ebx, eax	;factor9
+  1202 000007F8 66B801000000            	mov		eax, 1	;factor9
+  1203 000007FE 7D02                    	jge		L3502		;factor9
+  1204 00000800 6648                    	dec		eax		;factor9
+  1205                                  L3502:		;factor8
+  1206 00000802 6621C0                  	and		eax, eax	;factor4
+  1207 00000805 7422                    	jz		L3500
+  1208 00000807 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1209 0000080C 678A00                  	mov		al, [eax]		;convert_com20
+  1210 0000080F 98                      	cbw		;convert_com10
+  1211 00000810 66                      	db 0x66
+  1212 00000811 98                      	db 0x98		;convert_com10
+  1213 00000812 6650                    	push	eax		;factor9
+  1214 00000814 66B839000000            	mov		eax, 0x39		;convert_com20
+  1215 0000081A 665B                    	pop		ebx		;factor9
+  1216 0000081C 6639C3                  	cmp		ebx, eax	;factor9
+  1217 0000081F 66B801000000            	mov		eax, 1	;factor9
+  1218 00000825 7E02                    	jle		L3511		;factor9
+  1219 00000827 6648                    	dec		eax		;factor9
+  1220                                  L3511:		;factor8
+  1221                                  L3500:		;factor4
+  1222                                  ;---------- c32_expr end ------
+  1223 00000829 6621C0                  	and		eax, eax
+  1224 0000082C 743B                    	jz		L3495
+  1225                                  ;---------- parser_block ----------
+  1226                                  ;---------- parser_function_block ----------
+  1227                                  ;---------- parser_dainyuu ----------
+  1228                                  ;---------- c32_expr ----------
+  1229                                  ;  26: 				numb = numb*16 + *str - '0';
+  1230 0000082E 66B810000000            	mov		eax, 0x10		;convert_com20
+  1231 00000834 6689C3                  	mov		ebx, eax	;factor12
+  1232 00000837 66678B4500              	mov		eax, [ebp+_getnum@_numb]		;convert_com20
+  1233 0000083C 66F7EB                  	imul	ebx		;factor12
+  1234 0000083F 6650                    	push	eax		;factor11
+  1235 00000841 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1236 00000846 678A00                  	mov		al, [eax]		;convert_com20
+  1237 00000849 98                      	cbw		;convert_com10
+  1238 0000084A 66                      	db 0x66
+  1239 0000084B 98                      	db 0x98		;convert_com10
+  1240 0000084C 665B                    	pop		ebx		;factor11
+  1241 0000084E 6601D8                  	add		eax, ebx	;factor11
+  1242 00000851 6650                    	push	eax		;factor11
+  1243 00000853 66B830000000            	mov		eax, 0x30		;convert_com20
+  1244 00000859 665B                    	pop		ebx		;factor11
+  1245 0000085B 6629C3                  	sub		ebx, eax	;factor11
+  1246 0000085E 6689D8                  	mov		eax, ebx	;factor11
+  1247 00000861 6667894500              	mov		[ebp+_getnum@_numb], eax	;expr_eq
+  1248                                  ;---------- c32_expr end ------
+  1249                                  ;  27: 			}
+  1250 00000866 E94201                  	jmp		L3496
+  1251                                  L3495:
+  1252                                  ;  28: 			else if(*str>='A' && *str<='F'){
+  1253                                  ;---------- parser_block ----------
+  1254                                  ;---------- parser_if ----------
+  1255                                  ;---------- c32_expr ----------
+  1256 00000869 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1257 0000086E 678A00                  	mov		al, [eax]		;convert_com20
+  1258 00000871 98                      	cbw		;convert_com10
+  1259 00000872 66                      	db 0x66
+  1260 00000873 98                      	db 0x98		;convert_com10
+  1261 00000874 6650                    	push	eax		;factor9
+  1262 00000876 66B841000000            	mov		eax, 0x41		;convert_com20
+  1263 0000087C 665B                    	pop		ebx		;factor9
+  1264 0000087E 6639C3                  	cmp		ebx, eax	;factor9
+  1265 00000881 66B801000000            	mov		eax, 1	;factor9
+  1266 00000887 7D02                    	jge		L3549		;factor9
+  1267 00000889 6648                    	dec		eax		;factor9
+  1268                                  L3549:		;factor8
+  1269 0000088B 6621C0                  	and		eax, eax	;factor4
+  1270 0000088E 7422                    	jz		L3547
+  1271 00000890 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1272 00000895 678A00                  	mov		al, [eax]		;convert_com20
+  1273 00000898 98                      	cbw		;convert_com10
+  1274 00000899 66                      	db 0x66
+  1275 0000089A 98                      	db 0x98		;convert_com10
+  1276 0000089B 6650                    	push	eax		;factor9
+  1277 0000089D 66B846000000            	mov		eax, 0x46		;convert_com20
+  1278 000008A3 665B                    	pop		ebx		;factor9
+  1279 000008A5 6639C3                  	cmp		ebx, eax	;factor9
+  1280 000008A8 66B801000000            	mov		eax, 1	;factor9
+  1281 000008AE 7E02                    	jle		L3558		;factor9
+  1282 000008B0 6648                    	dec		eax		;factor9
+  1283                                  L3558:		;factor8
+  1284                                  L3547:		;factor4
+  1285                                  ;---------- c32_expr end ------
+  1286 000008B2 6621C0                  	and		eax, eax
+  1287 000008B5 7448                    	jz		L3542
+  1288                                  ;---------- parser_block ----------
+  1289                                  ;---------- parser_function_block ----------
+  1290                                  ;---------- parser_dainyuu ----------
+  1291                                  ;---------- c32_expr ----------
+  1292                                  ;  29: 				numb = numb*16 + *str -'A' +10;
+  1293 000008B7 66B810000000            	mov		eax, 0x10		;convert_com20
+  1294 000008BD 6689C3                  	mov		ebx, eax	;factor12
+  1295 000008C0 66678B4500              	mov		eax, [ebp+_getnum@_numb]		;convert_com20
+  1296 000008C5 66F7EB                  	imul	ebx		;factor12
+  1297 000008C8 6650                    	push	eax		;factor11
+  1298 000008CA 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1299 000008CF 678A00                  	mov		al, [eax]		;convert_com20
+  1300 000008D2 98                      	cbw		;convert_com10
+  1301 000008D3 66                      	db 0x66
+  1302 000008D4 98                      	db 0x98		;convert_com10
+  1303 000008D5 665B                    	pop		ebx		;factor11
+  1304 000008D7 6601D8                  	add		eax, ebx	;factor11
+  1305 000008DA 6650                    	push	eax		;factor11
+  1306 000008DC 66B841000000            	mov		eax, 0x41		;convert_com20
+  1307 000008E2 665B                    	pop		ebx		;factor11
+  1308 000008E4 6629C3                  	sub		ebx, eax	;factor11
+  1309 000008E7 6689D8                  	mov		eax, ebx	;factor11
+  1310 000008EA 6650                    	push	eax		;factor11
+  1311 000008EC 66B80A000000            	mov		eax, 0xa		;convert_com20
+  1312 000008F2 665B                    	pop		ebx		;factor11
+  1313 000008F4 6601D8                  	add		eax, ebx	;factor11
+  1314 000008F7 6667894500              	mov		[ebp+_getnum@_numb], eax	;expr_eq
+  1315                                  ;---------- c32_expr end ------
+  1316                                  ;  30: 			}
+  1317 000008FC E9AC00                  	jmp		L3543
+  1318                                  L3542:
+  1319                                  ;  31: 			else if(*str>='a' && *str<='f'){
+  1320                                  ;---------- parser_block ----------
+  1321                                  ;---------- parser_if ----------
+  1322                                  ;---------- c32_expr ----------
+  1323 000008FF 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1324 00000904 678A00                  	mov		al, [eax]		;convert_com20
+  1325 00000907 98                      	cbw		;convert_com10
+  1326 00000908 66                      	db 0x66
+  1327 00000909 98                      	db 0x98		;convert_com10
+  1328 0000090A 6650                    	push	eax		;factor9
+  1329 0000090C 66B861000000            	mov		eax, 0x61		;convert_com20
+  1330 00000912 665B                    	pop		ebx		;factor9
+  1331 00000914 6639C3                  	cmp		ebx, eax	;factor9
+  1332 00000917 66B801000000            	mov		eax, 1	;factor9
+  1333 0000091D 7D02                    	jge		L3598		;factor9
+  1334 0000091F 6648                    	dec		eax		;factor9
+  1335                                  L3598:		;factor8
+  1336 00000921 6621C0                  	and		eax, eax	;factor4
+  1337 00000924 7422                    	jz		L3596
+  1338 00000926 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1339 0000092B 678A00                  	mov		al, [eax]		;convert_com20
+  1340 0000092E 98                      	cbw		;convert_com10
+  1341 0000092F 66                      	db 0x66
+  1342 00000930 98                      	db 0x98		;convert_com10
+  1343 00000931 6650                    	push	eax		;factor9
+  1344 00000933 66B866000000            	mov		eax, 0x66		;convert_com20
+  1345 00000939 665B                    	pop		ebx		;factor9
+  1346 0000093B 6639C3                  	cmp		ebx, eax	;factor9
+  1347 0000093E 66B801000000            	mov		eax, 1	;factor9
+  1348 00000944 7E02                    	jle		L3607		;factor9
+  1349 00000946 6648                    	dec		eax		;factor9
+  1350                                  L3607:		;factor8
+  1351                                  L3596:		;factor4
+  1352                                  ;---------- c32_expr end ------
+  1353 00000948 6621C0                  	and		eax, eax
+  1354 0000094B 7447                    	jz		L3591
+  1355                                  ;---------- parser_block ----------
+  1356                                  ;---------- parser_function_block ----------
+  1357                                  ;---------- parser_dainyuu ----------
+  1358                                  ;---------- c32_expr ----------
+  1359                                  ;  32: 				numb = numb*16 + *str -'a' +10;
+  1360 0000094D 66B810000000            	mov		eax, 0x10		;convert_com20
+  1361 00000953 6689C3                  	mov		ebx, eax	;factor12
+  1362 00000956 66678B4500              	mov		eax, [ebp+_getnum@_numb]		;convert_com20
+  1363 0000095B 66F7EB                  	imul	ebx		;factor12
+  1364 0000095E 6650                    	push	eax		;factor11
+  1365 00000960 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1366 00000965 678A00                  	mov		al, [eax]		;convert_com20
+  1367 00000968 98                      	cbw		;convert_com10
+  1368 00000969 66                      	db 0x66
+  1369 0000096A 98                      	db 0x98		;convert_com10
+  1370 0000096B 665B                    	pop		ebx		;factor11
+  1371 0000096D 6601D8                  	add		eax, ebx	;factor11
+  1372 00000970 6650                    	push	eax		;factor11
+  1373 00000972 66B861000000            	mov		eax, 0x61		;convert_com20
+  1374 00000978 665B                    	pop		ebx		;factor11
+  1375 0000097A 6629C3                  	sub		ebx, eax	;factor11
+  1376 0000097D 6689D8                  	mov		eax, ebx	;factor11
+  1377 00000980 6650                    	push	eax		;factor11
+  1378 00000982 66B80A000000            	mov		eax, 0xa		;convert_com20
+  1379 00000988 665B                    	pop		ebx		;factor11
+  1380 0000098A 6601D8                  	add		eax, ebx	;factor11
+  1381 0000098D 6667894500              	mov		[ebp+_getnum@_numb], eax	;expr_eq
+  1382                                  ;---------- c32_expr end ------
+  1383                                  ;  33: 			}
+  1384 00000992 EB17                    	jmp		L3592
+  1385                                  L3591:
+  1386                                  ;  34: 			else{
+  1387                                  ;---------- parser_block ----------
+  1388                                  ;---------- parser_function_block ----------
+  1389                                  ;----------  parser_return  ---------
+  1390                                  ;  35: 				return numb*neg;
+  1391                                  ;---------- c32_expr ----------
+  1392 00000994 66678B4504              	mov		eax, [ebp+_getnum@_neg]		;convert_com20
+  1393 00000999 6689C3                  	mov		ebx, eax	;factor12
+  1394 0000099C 66678B4500              	mov		eax, [ebp+_getnum@_numb]		;convert_com20
+  1395 000009A1 66F7EB                  	imul	ebx		;factor12
+  1396                                  ;---------- c32_expr end ------
+  1397 000009A4 6683C408                	add		esp, 8		; auto variable clear
+  1398 000009A8 665D                    	pop		ebp
+  1399 000009AA C3                      	ret
+  1400                                  ;  36: 			}
+  1401                                  L3592:
+  1402                                  L3543:
+  1403                                  L3496:
+  1404                                  ;---------- parser_dainyuu ----------
+  1405                                  ;---------- c32_expr ----------
+  1406                                  ;  37: 			str++;
+  1407 000009AB 66678B5D0E              	mov		ebx, [ebp+_getnum@_str]		;factor13
+  1408 000009B0 666783450E01            	add		dword	[ebp+_getnum@_str], 0x1	;factor13
+  1409 000009B6 6689D8                  	mov		eax, ebx	;factor13
+  1410                                  ;---------- c32_expr end ------
+  1411                                  ;  38: 		}
+  1412 000009B9 E922FE                  	jmp		L3492
+  1413                                  L3491:
+  1414                                  ;  39: 	}
+  1415 000009BC E9B400                  	jmp		L3437
+  1416                                  L3436:
+  1417                                  ;  40: 	else{
+  1418                                  ;---------- parser_block ----------
+  1419                                  ;---------- parser_function_block ----------
+  1420                                  ;---------- parser_for ----------
+  1421                                  ;  41: 		for(;;){
+  1422                                  L3660:
+  1423 000009BF EB02                    	jmp		L3661
+  1424                                  L3659:
+  1425 000009C1 EBFC                    	jmp		L3660
+  1426                                  L3661:
+  1427                                  ;---------- parser_block ----------
+  1428                                  ;---------- parser_function_block ----------
+  1429                                  ;---------- parser_if ----------
+  1430                                  ;  42: 			if(*str>='0' && *str<='9'){
+  1431                                  ;---------- c32_expr ----------
+  1432 000009C3 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1433 000009C8 678A00                  	mov		al, [eax]		;convert_com20
+  1434 000009CB 98                      	cbw		;convert_com10
+  1435 000009CC 66                      	db 0x66
+  1436 000009CD 98                      	db 0x98		;convert_com10
+  1437 000009CE 6650                    	push	eax		;factor9
+  1438 000009D0 66B830000000            	mov		eax, 0x30		;convert_com20
+  1439 000009D6 665B                    	pop		ebx		;factor9
+  1440 000009D8 6639C3                  	cmp		ebx, eax	;factor9
+  1441 000009DB 66B801000000            	mov		eax, 1	;factor9
+  1442 000009E1 7D02                    	jge		L3669		;factor9
+  1443 000009E3 6648                    	dec		eax		;factor9
+  1444                                  L3669:		;factor8
+  1445 000009E5 6621C0                  	and		eax, eax	;factor4
+  1446 000009E8 7422                    	jz		L3667
+  1447 000009EA 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1448 000009EF 678A00                  	mov		al, [eax]		;convert_com20
+  1449 000009F2 98                      	cbw		;convert_com10
+  1450 000009F3 66                      	db 0x66
+  1451 000009F4 98                      	db 0x98		;convert_com10
+  1452 000009F5 6650                    	push	eax		;factor9
+  1453 000009F7 66B839000000            	mov		eax, 0x39		;convert_com20
+  1454 000009FD 665B                    	pop		ebx		;factor9
+  1455 000009FF 6639C3                  	cmp		ebx, eax	;factor9
+  1456 00000A02 66B801000000            	mov		eax, 1	;factor9
+  1457 00000A08 7E02                    	jle		L3678		;factor9
+  1458 00000A0A 6648                    	dec		eax		;factor9
+  1459                                  L3678:		;factor8
+  1460                                  L3667:		;factor4
+  1461                                  ;---------- c32_expr end ------
+  1462 00000A0C 6621C0                  	and		eax, eax
+  1463 00000A0F 743A                    	jz		L3662
+  1464                                  ;---------- parser_block ----------
+  1465                                  ;---------- parser_function_block ----------
+  1466                                  ;---------- parser_dainyuu ----------
+  1467                                  ;---------- c32_expr ----------
+  1468                                  ;  43: 				numb = numb*10 + *str - '0';
+  1469 00000A11 66B80A000000            	mov		eax, 0xa		;convert_com20
+  1470 00000A17 6689C3                  	mov		ebx, eax	;factor12
+  1471 00000A1A 66678B4500              	mov		eax, [ebp+_getnum@_numb]		;convert_com20
+  1472 00000A1F 66F7EB                  	imul	ebx		;factor12
+  1473 00000A22 6650                    	push	eax		;factor11
+  1474 00000A24 66678B450E              	mov		eax, [ebp+_getnum@_str]		;convert_com20
+  1475 00000A29 678A00                  	mov		al, [eax]		;convert_com20
+  1476 00000A2C 98                      	cbw		;convert_com10
+  1477 00000A2D 66                      	db 0x66
+  1478 00000A2E 98                      	db 0x98		;convert_com10
+  1479 00000A2F 665B                    	pop		ebx		;factor11
+  1480 00000A31 6601D8                  	add		eax, ebx	;factor11
+  1481 00000A34 6650                    	push	eax		;factor11
+  1482 00000A36 66B830000000            	mov		eax, 0x30		;convert_com20
+  1483 00000A3C 665B                    	pop		ebx		;factor11
+  1484 00000A3E 6629C3                  	sub		ebx, eax	;factor11
+  1485 00000A41 6689D8                  	mov		eax, ebx	;factor11
+  1486 00000A44 6667894500              	mov		[ebp+_getnum@_numb], eax	;expr_eq
+  1487                                  ;---------- c32_expr end ------
+  1488                                  ;  44: 			}
+  1489 00000A49 EB17                    	jmp		L3663
+  1490                                  L3662:
+  1491                                  ;  45: 			else{
+  1492                                  ;---------- parser_block ----------
+  1493                                  ;---------- parser_function_block ----------
+  1494                                  ;----------  parser_return  ---------
+  1495                                  ;  46: 				return numb*neg;
+  1496                                  ;---------- c32_expr ----------
+  1497 00000A4B 66678B4504              	mov		eax, [ebp+_getnum@_neg]		;convert_com20
+  1498 00000A50 6689C3                  	mov		ebx, eax	;factor12
+  1499 00000A53 66678B4500              	mov		eax, [ebp+_getnum@_numb]		;convert_com20
+  1500 00000A58 66F7EB                  	imul	ebx		;factor12
+  1501                                  ;---------- c32_expr end ------
+  1502 00000A5B 6683C408                	add		esp, 8		; auto variable clear
+  1503 00000A5F 665D                    	pop		ebp
+  1504 00000A61 C3                      	ret
+  1505                                  ;  47: 			}
+  1506                                  L3663:
+  1507                                  ;---------- parser_dainyuu ----------
+  1508                                  ;---------- c32_expr ----------
+  1509                                  ;  48: 			str++;
+  1510 00000A62 66678B5D0E              	mov		ebx, [ebp+_getnum@_str]		;factor13
+  1511 00000A67 666783450E01            	add		dword	[ebp+_getnum@_str], 0x1	;factor13
+  1512 00000A6D 6689D8                  	mov		eax, ebx	;factor13
+  1513                                  ;---------- c32_expr end ------
+  1514                                  ;  49: 		}
+  1515 00000A70 E94EFF                  	jmp		L3659
+  1516                                  L3658:
+  1517                                  ;  50: 	}
+  1518                                  L3437:
+  1519                                  ;  51: }
+  1520 00000A73 6683C408                	add		esp, 8		; auto variable clear
+  1521 00000A77 665D                    	pop		ebp
+  1522 00000A79 C3                      	ret
+  1523                                  ;  52: 
+  1524                                  ;  53: void spskip()
+  1525                                  ;---------- function _spskip ----------
+  1526                                  _spskip:
+  1527 00000A7A 6655                    	push	ebp
+  1528 00000A7C 6689E5                  	mov		ebp, esp
+  1529                                  ;---------- parser_function_block ----------
+  1530                                  ;  54: {
+  1531                                  ;---------- parser_while ----------
+  1532                                  ;  55: 	while(*linebufp==' ' || *linebufp=='\t'){
+  1533                                  L3728:
+  1534                                  ;---------- c32_expr ----------
+  1535 00000A7F 66A1[2407]              	mov		eax, [_linebufp]		;convert_com20
+  1536 00000A83 678A00                  	mov		al, [eax]		;convert_com20
+  1537 00000A86 98                      	cbw		;convert_com10
+  1538 00000A87 66                      	db 0x66
+  1539 00000A88 98                      	db 0x98		;convert_com10
+  1540 00000A89 6650                    	push	eax		;factor8
+  1541 00000A8B 66B820000000            	mov		eax, 0x20		;convert_com20
+  1542 00000A91 665B                    	pop		ebx		;factor8
+  1543 00000A93 6639D8                  	cmp		eax, ebx	;factor8
+  1544 00000A96 66B801000000            	mov		eax, 1	;factor8-9
+  1545 00000A9C 7402                    	jz		L3734		;factor8-10
+  1546 00000A9E 6648                    	dec		eax		;factor8-11
+  1547                                  L3734:		;factor8
+  1548 00000AA0 6621C0                  	and		eax, eax	;factor3
+  1549 00000AA3 7521                    	jnz		L3732
+  1550 00000AA5 66A1[2407]              	mov		eax, [_linebufp]		;convert_com20
+  1551 00000AA9 678A00                  	mov		al, [eax]		;convert_com20
+  1552 00000AAC 98                      	cbw		;convert_com10
+  1553 00000AAD 66                      	db 0x66
+  1554 00000AAE 98                      	db 0x98		;convert_com10
+  1555 00000AAF 6650                    	push	eax		;factor8
+  1556 00000AB1 66B809000000            	mov		eax, 0x9		;convert_com20
+  1557 00000AB7 665B                    	pop		ebx		;factor8
+  1558 00000AB9 6639D8                  	cmp		eax, ebx	;factor8
+  1559 00000ABC 66B801000000            	mov		eax, 1	;factor8-9
+  1560 00000AC2 7402                    	jz		L3745		;factor8-10
+  1561 00000AC4 6648                    	dec		eax		;factor8-11
+  1562                                  L3745:		;factor8
+  1563                                  L3732:		;factor3
+  1564                                  ;---------- c32_expr end ------
+  1565 00000AC6 6621C0                  	and		eax, eax
+  1566 00000AC9 7410                    	jz		L3727
+  1567                                  L3729:
+  1568                                  ;---------- parser_block ----------
+  1569                                  ;---------- parser_function_block ----------
+  1570                                  ;---------- parser_dainyuu ----------
+  1571                                  ;---------- c32_expr ----------
+  1572                                  ;  56: 		linebufp++;
+  1573 00000ACB 668B1E[2407]            	mov		ebx, [_linebufp]		;factor13
+  1574 00000AD0 668306[2407]01          	add		dword	[_linebufp], 0x1	;factor13
+  1575 00000AD6 6689D8                  	mov		eax, ebx	;factor13
+  1576                                  ;---------- c32_expr end ------
+  1577                                  ;  57: 	}
+  1578 00000AD9 EBA4                    	jmp		L3728
+  1579                                  L3727:
+  1580                                  ;  58: }
+  1581 00000ADB 665D                    	pop		ebp
+  1582 00000ADD C3                      	ret
+  1583                                  ;  59: 
+  1584                                  ;  60: void getsym()
+  1585                                  _getsym@_i	equ	0
+  1586                                  ;---------- function _getsym ----------
+  1587                                  _getsym:
+  1588 00000ADE 6655                    	push	ebp
+  1589 00000AE0 6683C4FC                	add		esp, -4		; auto variable
+  1590 00000AE4 6689E5                  	mov		ebp, esp
+  1591                                  ;---------- parser_function_block ----------
+  1592                                  ;  61: {
+  1593                                  ;  62: 	int i;
+  1594                                  ;---------- parser_dainyuu ----------
+  1595                                  ;---------- c32_expr ----------
+  1596                                  ;  63: 	
+  1597                                  ;  64: 	spskip();
+  1598                                  ;---------- call _spskip ----------
+  1599 00000AE7 E890FF                  	call	_spskip		;expr_function_call
+  1600                                  ;---------- c32_expr end ------
+  1601                                  ;---------- parser_for ----------
+  1602                                  ;  65: 	for(i=0; i<64-1; i++){
+  1603                                  ;---------- parser_dainyuu ----------
+  1604                                  ;---------- c32_expr ----------
+  1605 00000AEA 66B800000000            	mov		eax, 0x0		;convert_com20
+  1606 00000AF0 6667894500              	mov		[ebp+_getsym@_i], eax	;expr_eq
+  1607                                  ;---------- c32_expr end ------
+  1608                                  L3772:
+  1609                                  ;---------- c32_expr ----------
+  1610 00000AF5 66678B4500              	mov		eax, [ebp+_getsym@_i]		;convert_com20
+  1611 00000AFA 6650                    	push	eax		;factor9
+  1612 00000AFC 66B83F000000            	mov		eax, 0x3f		;convert_com20
+  1613 00000B02 665B                    	pop		ebx		;factor9
+  1614 00000B04 6639C3                  	cmp		ebx, eax	;factor9
+  1615 00000B07 66B801000000            	mov		eax, 1	;factor9
+  1616 00000B0D 7C02                    	jl		L3795		;factor9
+  1617 00000B0F 6648                    	dec		eax		;factor9
+  1618                                  L3795:		;factor8
+  1619                                  ;---------- c32_expr end ------
+  1620 00000B11 6621C0                  	and		eax, eax
+  1621 00000B14 0F840C01                	jz		L3770
+  1622 00000B18 EB10                    	jmp		L3773
+  1623                                  L3771:
+  1624                                  ;---------- c32_expr ----------
+  1625 00000B1A 66678B5D00              	mov		ebx, [ebp+_getsym@_i]		;factor13
+  1626 00000B1F 666783450001            	add		dword	[ebp+_getsym@_i], 0x1	;factor13
+  1627 00000B25 6689D8                  	mov		eax, ebx	;factor13
+  1628                                  ;---------- c32_expr end ------
+  1629 00000B28 EBCB                    	jmp		L3772
+  1630                                  L3773:
+  1631                                  ;---------- parser_block ----------
+  1632                                  ;---------- parser_function_block ----------
+  1633                                  ;---------- parser_if ----------
+  1634                                  ;  66: 		if(*linebufp==' ' || *linebufp=='\t' || *linebufp==0 || *linebufp=='\n'){
+  1635                                  ;---------- c32_expr ----------
+  1636 00000B2A 66A1[2407]              	mov		eax, [_linebufp]		;convert_com20
+  1637 00000B2E 678A00                  	mov		al, [eax]		;convert_com20
+  1638 00000B31 98                      	cbw		;convert_com10
+  1639 00000B32 66                      	db 0x66
+  1640 00000B33 98                      	db 0x98		;convert_com10
+  1641 00000B34 6650                    	push	eax		;factor8
+  1642 00000B36 66B820000000            	mov		eax, 0x20		;convert_com20
+  1643 00000B3C 665B                    	pop		ebx		;factor8
+  1644 00000B3E 6639D8                  	cmp		eax, ebx	;factor8
+  1645 00000B41 66B801000000            	mov		eax, 1	;factor8-9
+  1646 00000B47 7402                    	jz		L3816		;factor8-10
+  1647 00000B49 6648                    	dec		eax		;factor8-11
+  1648                                  L3816:		;factor8
+  1649 00000B4B 6621C0                  	and		eax, eax	;factor3
+  1650 00000B4E 756D                    	jnz		L3814
+  1651 00000B50 66A1[2407]              	mov		eax, [_linebufp]		;convert_com20
+  1652 00000B54 678A00                  	mov		al, [eax]		;convert_com20
+  1653 00000B57 98                      	cbw		;convert_com10
+  1654 00000B58 66                      	db 0x66
+  1655 00000B59 98                      	db 0x98		;convert_com10
+  1656 00000B5A 6650                    	push	eax		;factor8
+  1657 00000B5C 66B809000000            	mov		eax, 0x9		;convert_com20
+  1658 00000B62 665B                    	pop		ebx		;factor8
+  1659 00000B64 6639D8                  	cmp		eax, ebx	;factor8
+  1660 00000B67 66B801000000            	mov		eax, 1	;factor8-9
+  1661 00000B6D 7402                    	jz		L3827		;factor8-10
+  1662 00000B6F 6648                    	dec		eax		;factor8-11
+  1663                                  L3827:		;factor8
+  1664 00000B71 6621C0                  	and		eax, eax	;factor3
+  1665 00000B74 7547                    	jnz		L3825
+  1666 00000B76 66A1[2407]              	mov		eax, [_linebufp]		;convert_com20
+  1667 00000B7A 678A00                  	mov		al, [eax]		;convert_com20
+  1668 00000B7D 98                      	cbw		;convert_com10
+  1669 00000B7E 66                      	db 0x66
+  1670 00000B7F 98                      	db 0x98		;convert_com10
+  1671 00000B80 6650                    	push	eax		;factor8
+  1672 00000B82 66B800000000            	mov		eax, 0x0		;convert_com20
+  1673 00000B88 665B                    	pop		ebx		;factor8
+  1674 00000B8A 6639D8                  	cmp		eax, ebx	;factor8
+  1675 00000B8D 66B801000000            	mov		eax, 1	;factor8-9
+  1676 00000B93 7402                    	jz		L3838		;factor8-10
+  1677 00000B95 6648                    	dec		eax		;factor8-11
+  1678                                  L3838:		;factor8
+  1679 00000B97 6621C0                  	and		eax, eax	;factor3
+  1680 00000B9A 7521                    	jnz		L3836
+  1681 00000B9C 66A1[2407]              	mov		eax, [_linebufp]		;convert_com20
+  1682 00000BA0 678A00                  	mov		al, [eax]		;convert_com20
+  1683 00000BA3 98                      	cbw		;convert_com10
+  1684 00000BA4 66                      	db 0x66
+  1685 00000BA5 98                      	db 0x98		;convert_com10
+  1686 00000BA6 6650                    	push	eax		;factor8
+  1687 00000BA8 66B80A000000            	mov		eax, 0xa		;convert_com20
+  1688 00000BAE 665B                    	pop		ebx		;factor8
+  1689 00000BB0 6639D8                  	cmp		eax, ebx	;factor8
+  1690 00000BB3 66B801000000            	mov		eax, 1	;factor8-9
+  1691 00000BB9 7402                    	jz		L3849		;factor8-10
+  1692 00000BBB 6648                    	dec		eax		;factor8-11
+  1693                                  L3849:		;factor8
+  1694                                  L3836:		;factor3
+  1695                                  L3825:		;factor3
+  1696                                  L3814:		;factor3
+  1697                                  ;---------- c32_expr end ------
+  1698 00000BBD 6621C0                  	and		eax, eax
+  1699 00000BC0 742D                    	jz		L3810
+  1700                                  ;---------- parser_block ----------
+  1701                                  ;---------- parser_function_block ----------
+  1702                                  ;---------- parser_dainyuu ----------
+  1703                                  ;---------- c32_expr ----------
+  1704                                  ;  67: 			symbuf[i] = 0;
+  1705                                  ;---------- c32_expr ----------
+  1706                                  ;---------- c32_expr end ------
+  1707 00000BC2 66678B4500              	mov		eax, [ebp+_getsym@_i]		;convert_com20
+  1708 00000BC7 66BB01000000            	mov		ebx, 0x1	;factor15
+  1709 00000BCD 66F7E3                  	mul		ebx		;factor15
+  1710 00000BD0 6605[E4060000]          	add		eax, _symbuf		;factor15
+  1711 00000BD6 6650                    	push	eax		;factor1
+  1712 00000BD8 66B800000000            	mov		eax, 0x0		;convert_com20
+  1713 00000BDE 6689C3                  	mov		ebx, eax	;expr_eq
+  1714 00000BE1 6658                    	pop		eax		;expr_eq
+  1715 00000BE3 678818                  	mov		[eax], bl	;expr_eq
+  1716                                  ;---------- c32_expr end ------
+  1717                                  ;----------  parser_return  ---------
+  1718                                  ;  68: 			return;
+  1719 00000BE6 6683C404                	add		esp, 4		; auto variable clear
+  1720 00000BEA 665D                    	pop		ebp
+  1721 00000BEC C3                      	ret
+  1722                                  ;  69: 		}
+  1723 00000BED EB00                    	jmp		L3811
+  1724                                  L3810:
+  1725                                  L3811:
+  1726                                  ;---------- parser_dainyuu ----------
+  1727                                  ;---------- c32_expr ----------
+  1728                                  ;  70: 		symbuf[i] = *linebufp++;
+  1729                                  ;---------- c32_expr ----------
+  1730                                  ;---------- c32_expr end ------
+  1731 00000BEF 66678B4500              	mov		eax, [ebp+_getsym@_i]		;convert_com20
+  1732 00000BF4 66BB01000000            	mov		ebx, 0x1	;factor15
+  1733 00000BFA 66F7E3                  	mul		ebx		;factor15
+  1734 00000BFD 6605[E4060000]          	add		eax, _symbuf		;factor15
+  1735 00000C03 6650                    	push	eax		;factor1
+  1736 00000C05 668B1E[2407]            	mov		ebx, [_linebufp]		;factor13
+  1737 00000C0A 668306[2407]01          	add		dword	[_linebufp], 0x1	;factor13
+  1738 00000C10 6689D8                  	mov		eax, ebx	;factor13
+  1739 00000C13 678A00                  	mov		al, [eax]		;convert_com20
+  1740 00000C16 98                      	cbw		;convert_com10
+  1741 00000C17 66                      	db 0x66
+  1742 00000C18 98                      	db 0x98		;convert_com10
+  1743 00000C19 6689C3                  	mov		ebx, eax	;expr_eq
+  1744 00000C1C 6658                    	pop		eax		;expr_eq
+  1745 00000C1E 678818                  	mov		[eax], bl	;expr_eq
+  1746                                  ;---------- c32_expr end ------
+  1747                                  ;  71: 	}
+  1748 00000C21 E9F6FE                  	jmp		L3771
+  1749                                  L3770:
+  1750                                  ;---------- parser_dainyuu ----------
+  1751                                  ;---------- c32_expr ----------
+  1752                                  ;  72: 	symbuf[i] = 0;
+  1753                                  ;---------- c32_expr ----------
+  1754                                  ;---------- c32_expr end ------
+  1755 00000C24 66678B4500              	mov		eax, [ebp+_getsym@_i]		;convert_com20
+  1756 00000C29 66BB01000000            	mov		ebx, 0x1	;factor15
+  1757 00000C2F 66F7E3                  	mul		ebx		;factor15
+  1758 00000C32 6605[E4060000]          	add		eax, _symbuf		;factor15
+  1759 00000C38 6650                    	push	eax		;factor1
+  1760 00000C3A 66B800000000            	mov		eax, 0x0		;convert_com20
+  1761 00000C40 6689C3                  	mov		ebx, eax	;expr_eq
+  1762 00000C43 6658                    	pop		eax		;expr_eq
+  1763 00000C45 678818                  	mov		[eax], bl	;expr_eq
+  1764                                  ;---------- c32_expr end ------
+  1765                                  ;  73: }
+  1766 00000C48 6683C404                	add		esp, 4		; auto variable clear
+  1767 00000C4C 665D                    	pop		ebp
+  1768 00000C4E C3                      	ret
+  1769                                  ;  74: 
+  1770                                  ;  75: void help()
+  1771                                  ;---------- function _help ----------
+  1772                                  _help:
+  1773 00000C4F 6655                    	push	ebp
+  1774 00000C51 6689E5                  	mov		ebp, esp
+  1775                                  ;---------- parser_function_block ----------
+  1776                                  ;  76: {
+  1777                                  ;---------- parser_dainyuu ----------
+  1778                                  ;---------- c32_expr ----------
+  1779                                  ;  77: 	putch('\n');
+  1780                                  ;---------- call _putch ----------
+  1781 00000C54 6683EC04                	sub		esp, 0x4	;expr_function_call
+  1782 00000C58 66B80A000000            	mov		eax, 0xa		;convert_com20
+  1783 00000C5E 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  1784 00000C63 E836F4                  	call	_putch		;expr_function_call
+  1785 00000C66 6683C404                	add		esp, 0x4	;expr_function_call
+  1786                                  ;---------- c32_expr end ------
+  1787                                  ;---------- parser_dainyuu ----------
+  1788                                  ;---------- c32_expr ----------
+  1789                                  ;  78: 	puts("> help                    ... help message\n");
+  1790                                  ;---------- call _puts ----------
+  1791 00000C6A 6683EC04                	sub		esp, 0x4	;expr_function_call
+  1792 00000C6E EB2C                    	jmp		L3965
+  1793                                  L3964:
+  1794 00000C70 3E                      	db		0x3e
+  1795 00000C71 20                      	db		0x20
+  1796 00000C72 68                      	db		0x68
+  1797 00000C73 65                      	db		0x65
+  1798 00000C74 6C                      	db		0x6c
+  1799 00000C75 70                      	db		0x70
+  1800 00000C76 20                      	db		0x20
+  1801 00000C77 20                      	db		0x20
+  1802 00000C78 20                      	db		0x20
+  1803 00000C79 20                      	db		0x20
+  1804 00000C7A 20                      	db		0x20
+  1805 00000C7B 20                      	db		0x20
+  1806 00000C7C 20                      	db		0x20
+  1807 00000C7D 20                      	db		0x20
+  1808 00000C7E 20                      	db		0x20
+  1809 00000C7F 20                      	db		0x20
+  1810 00000C80 20                      	db		0x20
+  1811 00000C81 20                      	db		0x20
+  1812 00000C82 20                      	db		0x20
+  1813 00000C83 20                      	db		0x20
+  1814 00000C84 20                      	db		0x20
+  1815 00000C85 20                      	db		0x20
+  1816 00000C86 20                      	db		0x20
+  1817 00000C87 20                      	db		0x20
+  1818 00000C88 20                      	db		0x20
+  1819 00000C89 20                      	db		0x20
+  1820 00000C8A 2E                      	db		0x2e
+  1821 00000C8B 2E                      	db		0x2e
+  1822 00000C8C 2E                      	db		0x2e
+  1823 00000C8D 20                      	db		0x20
+  1824 00000C8E 68                      	db		0x68
+  1825 00000C8F 65                      	db		0x65
+  1826 00000C90 6C                      	db		0x6c
+  1827 00000C91 70                      	db		0x70
+  1828 00000C92 20                      	db		0x20
+  1829 00000C93 6D                      	db		0x6d
+  1830 00000C94 65                      	db		0x65
+  1831 00000C95 73                      	db		0x73
+  1832 00000C96 73                      	db		0x73
+  1833 00000C97 61                      	db		0x61
+  1834 00000C98 67                      	db		0x67
+  1835 00000C99 65                      	db		0x65
+  1836 00000C9A 0A                      	db		0xa
+  1837 00000C9B 00                      	db		0x0
+  1838                                  L3965:
+  1839 00000C9C 66B8[700C0000]          	mov		eax, L3964		;convert_com20
+  1840 00000CA2 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  1841 00000CA7 E859F5                  	call	_puts		;expr_function_call
+  1842 00000CAA 6683C404                	add		esp, 0x4	;expr_function_call
+  1843                                  ;---------- c32_expr end ------
+  1844                                  ;---------- parser_dainyuu ----------
+  1845                                  ;---------- c32_expr ----------
+  1846                                  ;  79: 	puts("> dump <addr> <len>       ... hex dump\n");
+  1847                                  ;---------- call _puts ----------
+  1848 00000CAE 6683EC04                	sub		esp, 0x4	;expr_function_call
+  1849 00000CB2 EB28                    	jmp		L3983
+  1850                                  L3982:
+  1851 00000CB4 3E                      	db		0x3e
+  1852 00000CB5 20                      	db		0x20
+  1853 00000CB6 64                      	db		0x64
+  1854 00000CB7 75                      	db		0x75
+  1855 00000CB8 6D                      	db		0x6d
+  1856 00000CB9 70                      	db		0x70
+  1857 00000CBA 20                      	db		0x20
+  1858 00000CBB 3C                      	db		0x3c
+  1859 00000CBC 61                      	db		0x61
+  1860 00000CBD 64                      	db		0x64
+  1861 00000CBE 64                      	db		0x64
+  1862 00000CBF 72                      	db		0x72
+  1863 00000CC0 3E                      	db		0x3e
+  1864 00000CC1 20                      	db		0x20
+  1865 00000CC2 3C                      	db		0x3c
+  1866 00000CC3 6C                      	db		0x6c
+  1867 00000CC4 65                      	db		0x65
+  1868 00000CC5 6E                      	db		0x6e
+  1869 00000CC6 3E                      	db		0x3e
+  1870 00000CC7 20                      	db		0x20
+  1871 00000CC8 20                      	db		0x20
+  1872 00000CC9 20                      	db		0x20
+  1873 00000CCA 20                      	db		0x20
+  1874 00000CCB 20                      	db		0x20
+  1875 00000CCC 20                      	db		0x20
+  1876 00000CCD 20                      	db		0x20
+  1877 00000CCE 2E                      	db		0x2e
+  1878 00000CCF 2E                      	db		0x2e
+  1879 00000CD0 2E                      	db		0x2e
+  1880 00000CD1 20                      	db		0x20
+  1881 00000CD2 68                      	db		0x68
+  1882 00000CD3 65                      	db		0x65
+  1883 00000CD4 78                      	db		0x78
+  1884 00000CD5 20                      	db		0x20
+  1885 00000CD6 64                      	db		0x64
+  1886 00000CD7 75                      	db		0x75
+  1887 00000CD8 6D                      	db		0x6d
+  1888 00000CD9 70                      	db		0x70
+  1889 00000CDA 0A                      	db		0xa
+  1890 00000CDB 00                      	db		0x0
+  1891                                  L3983:
+  1892 00000CDC 66B8[B40C0000]          	mov		eax, L3982		;convert_com20
+  1893 00000CE2 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  1894 00000CE7 E819F5                  	call	_puts		;expr_function_call
+  1895 00000CEA 6683C404                	add		esp, 0x4	;expr_function_call
+  1896                                  ;---------- c32_expr end ------
+  1897                                  ;---------- parser_dainyuu ----------
+  1898                                  ;---------- c32_expr ----------
+  1899                                  ;  80: 	puts("> exit                    ... exit\n");
+  1900                                  ;---------- call _puts ----------
+  1901 00000CEE 6683EC04                	sub		esp, 0x4	;expr_function_call
+  1902 00000CF2 EB24                    	jmp		L4001
+  1903                                  L4000:
+  1904 00000CF4 3E                      	db		0x3e
+  1905 00000CF5 20                      	db		0x20
+  1906 00000CF6 65                      	db		0x65
+  1907 00000CF7 78                      	db		0x78
+  1908 00000CF8 69                      	db		0x69
+  1909 00000CF9 74                      	db		0x74
+  1910 00000CFA 20                      	db		0x20
+  1911 00000CFB 20                      	db		0x20
+  1912 00000CFC 20                      	db		0x20
+  1913 00000CFD 20                      	db		0x20
+  1914 00000CFE 20                      	db		0x20
+  1915 00000CFF 20                      	db		0x20
+  1916 00000D00 20                      	db		0x20
+  1917 00000D01 20                      	db		0x20
+  1918 00000D02 20                      	db		0x20
+  1919 00000D03 20                      	db		0x20
+  1920 00000D04 20                      	db		0x20
+  1921 00000D05 20                      	db		0x20
+  1922 00000D06 20                      	db		0x20
+  1923 00000D07 20                      	db		0x20
+  1924 00000D08 20                      	db		0x20
+  1925 00000D09 20                      	db		0x20
+  1926 00000D0A 20                      	db		0x20
+  1927 00000D0B 20                      	db		0x20
+  1928 00000D0C 20                      	db		0x20
+  1929 00000D0D 20                      	db		0x20
+  1930 00000D0E 2E                      	db		0x2e
+  1931 00000D0F 2E                      	db		0x2e
+  1932 00000D10 2E                      	db		0x2e
+  1933 00000D11 20                      	db		0x20
+  1934 00000D12 65                      	db		0x65
+  1935 00000D13 78                      	db		0x78
+  1936 00000D14 69                      	db		0x69
+  1937 00000D15 74                      	db		0x74
+  1938 00000D16 0A                      	db		0xa
+  1939 00000D17 00                      	db		0x0
+  1940                                  L4001:
+  1941 00000D18 66B8[F40C0000]          	mov		eax, L4000		;convert_com20
+  1942 00000D1E 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  1943 00000D23 E8DDF4                  	call	_puts		;expr_function_call
+  1944 00000D26 6683C404                	add		esp, 0x4	;expr_function_call
+  1945                                  ;---------- c32_expr end ------
+  1946                                  ;---------- parser_dainyuu ----------
+  1947                                  ;---------- c32_expr ----------
+  1948                                  ;  81: 	putch('\n');
+  1949                                  ;---------- call _putch ----------
+  1950 00000D2A 6683EC04                	sub		esp, 0x4	;expr_function_call
+  1951 00000D2E 66B80A000000            	mov		eax, 0xa		;convert_com20
+  1952 00000D34 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  1953 00000D39 E860F3                  	call	_putch		;expr_function_call
+  1954 00000D3C 6683C404                	add		esp, 0x4	;expr_function_call
+  1955                                  ;---------- c32_expr end ------
+  1956                                  ;  82: }
+  1957 00000D40 665D                    	pop		ebp
+  1958 00000D42 C3                      	ret
+  1959                                  ;  83: 
+  1960                                  ;  84: void dump(unsigned int addr, unsigned int len)
+  1961                                  _dump@_addr	equ	14
+  1962                                  _dump@_len	equ	18
+  1963                                  _dump@_i	equ	0
+  1964                                  _dump@_pre_len	equ	4
+  1965                                  ;---------- function _dump ----------
+  1966                                  _dump:
+  1967 00000D43 6655                    	push	ebp
+  1968 00000D45 6683C4F8                	add		esp, -8		; auto variable
+  1969 00000D49 6689E5                  	mov		ebp, esp
+  1970                                  ;---------- parser_function_block ----------
+  1971                                  ;  85: {
+  1972                                  ;  86: 	int i, pre_len;
+  1973                                  ;---------- parser_if ----------
+  1974                                  ;  87: 	
+  1975                                  ;  88: 	if(len==0){
+  1976                                  ;---------- c32_expr ----------
+  1977 00000D4C 66678B4512              	mov		eax, [ebp+_dump@_len]		;convert_com20
+  1978 00000D51 6650                    	push	eax		;factor8
+  1979 00000D53 66B800000000            	mov		eax, 0x0		;convert_com20
+  1980 00000D59 665B                    	pop		ebx		;factor8
+  1981 00000D5B 6639D8                  	cmp		eax, ebx	;factor8
+  1982 00000D5E 66B801000000            	mov		eax, 1	;factor8-9
+  1983 00000D64 7402                    	jz		L4024		;factor8-10
+  1984 00000D66 6648                    	dec		eax		;factor8-11
+  1985                                  L4024:		;factor8
+  1986                                  ;---------- c32_expr end ------
+  1987 00000D68 6621C0                  	and		eax, eax
+  1988 00000D6B 740D                    	jz		L4018
+  1989                                  ;---------- parser_block ----------
+  1990                                  ;---------- parser_function_block ----------
+  1991                                  ;---------- parser_dainyuu ----------
+  1992                                  ;---------- c32_expr ----------
+  1993                                  ;  89: 		len = 16;
+  1994 00000D6D 66B810000000            	mov		eax, 0x10		;convert_com20
+  1995 00000D73 6667894512              	mov		[ebp+_dump@_len], eax	;expr_eq
+  1996                                  ;---------- c32_expr end ------
+  1997                                  ;  90: 	}
+  1998 00000D78 EB00                    	jmp		L4019
+  1999                                  L4018:
+  2000                                  L4019:
+  2001                                  ;---------- parser_dainyuu ----------
+  2002                                  ;---------- c32_expr ----------
+  2003                                  ;  91: 	pre_len = (addr & 0xf);
+  2004                                  ;---------- c32_expr ----------
+  2005 00000D7A 66B80F000000            	mov		eax, 0xf		;convert_com20
+  2006 00000D80 6689C3                  	mov		ebx, eax	;factor7
+  2007 00000D83 66678B450E              	mov		eax, [ebp+_dump@_addr]		;convert_com20
+  2008 00000D88 6621D8                  	and		eax, ebx	;factor7
+  2009                                  ;---------- c32_expr end ------
+  2010 00000D8B 6667894504              	mov		[ebp+_dump@_pre_len], eax	;expr_eq
+  2011                                  ;---------- c32_expr end ------
+  2012                                  ;---------- parser_dainyuu ----------
+  2013                                  ;---------- c32_expr ----------
+  2014                                  ;  92: 	addr &= 0xfffffff0;
+  2015 00000D90 66B8F0FFFFFF            	mov		eax, 0xfffffff0		;convert_com20
+  2016 00000D96 666721450E              	and		[ebp+_dump@_addr], eax	;expr_and_eq
+  2017                                  ;---------- c32_expr end ------
+  2018                                  ;---------- parser_dainyuu ----------
+  2019                                  ;---------- c32_expr ----------
+  2020                                  ;  93: 	puts("addr:  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f\n");
+  2021                                  ;---------- call _puts ----------
+  2022 00000D9B 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2023 00000D9F EB37                    	jmp		L4108
+  2024                                  L4107:
+  2025 00000DA1 61                      	db		0x61
+  2026 00000DA2 64                      	db		0x64
+  2027 00000DA3 64                      	db		0x64
+  2028 00000DA4 72                      	db		0x72
+  2029 00000DA5 3A                      	db		0x3a
+  2030 00000DA6 20                      	db		0x20
+  2031 00000DA7 20                      	db		0x20
+  2032 00000DA8 30                      	db		0x30
+  2033 00000DA9 20                      	db		0x20
+  2034 00000DAA 20                      	db		0x20
+  2035 00000DAB 31                      	db		0x31
+  2036 00000DAC 20                      	db		0x20
+  2037 00000DAD 20                      	db		0x20
+  2038 00000DAE 32                      	db		0x32
+  2039 00000DAF 20                      	db		0x20
+  2040 00000DB0 20                      	db		0x20
+  2041 00000DB1 33                      	db		0x33
+  2042 00000DB2 20                      	db		0x20
+  2043 00000DB3 20                      	db		0x20
+  2044 00000DB4 34                      	db		0x34
+  2045 00000DB5 20                      	db		0x20
+  2046 00000DB6 20                      	db		0x20
+  2047 00000DB7 35                      	db		0x35
+  2048 00000DB8 20                      	db		0x20
+  2049 00000DB9 20                      	db		0x20
+  2050 00000DBA 36                      	db		0x36
+  2051 00000DBB 20                      	db		0x20
+  2052 00000DBC 20                      	db		0x20
+  2053 00000DBD 37                      	db		0x37
+  2054 00000DBE 20                      	db		0x20
+  2055 00000DBF 20                      	db		0x20
+  2056 00000DC0 38                      	db		0x38
+  2057 00000DC1 20                      	db		0x20
+  2058 00000DC2 20                      	db		0x20
+  2059 00000DC3 39                      	db		0x39
+  2060 00000DC4 20                      	db		0x20
+  2061 00000DC5 20                      	db		0x20
+  2062 00000DC6 61                      	db		0x61
+  2063 00000DC7 20                      	db		0x20
+  2064 00000DC8 20                      	db		0x20
+  2065 00000DC9 62                      	db		0x62
+  2066 00000DCA 20                      	db		0x20
+  2067 00000DCB 20                      	db		0x20
+  2068 00000DCC 63                      	db		0x63
+  2069 00000DCD 20                      	db		0x20
+  2070 00000DCE 20                      	db		0x20
+  2071 00000DCF 64                      	db		0x64
+  2072 00000DD0 20                      	db		0x20
+  2073 00000DD1 20                      	db		0x20
+  2074 00000DD2 65                      	db		0x65
+  2075 00000DD3 20                      	db		0x20
+  2076 00000DD4 20                      	db		0x20
+  2077 00000DD5 66                      	db		0x66
+  2078 00000DD6 0A                      	db		0xa
+  2079 00000DD7 00                      	db		0x0
+  2080                                  L4108:
+  2081 00000DD8 66B8[A10D0000]          	mov		eax, L4107		;convert_com20
+  2082 00000DDE 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2083 00000DE3 E81DF4                  	call	_puts		;expr_function_call
+  2084 00000DE6 6683C404                	add		esp, 0x4	;expr_function_call
+  2085                                  ;---------- c32_expr end ------
+  2086                                  ;---------- parser_if ----------
+  2087                                  ;  94: 	if(pre_len){
+  2088                                  ;---------- c32_expr ----------
+  2089                                  ;---------- c32_expr end ------
+  2090 00000DEA 66678B4504              	mov		eax, [ebp+_dump@_pre_len]		;convert_com20
+  2091 00000DEF 6621C0                  	and		eax, eax
+  2092 00000DF2 0F846301                	jz		L4109
+  2093                                  ;---------- parser_block ----------
+  2094                                  ;---------- parser_function_block ----------
+  2095                                  ;---------- parser_dainyuu ----------
+  2096                                  ;---------- c32_expr ----------
+  2097                                  ;  95: 		printf_4x(addr);
+  2098                                  ;---------- call _printf_4x ----------
+  2099 00000DF6 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2100 00000DFA 66678B450E              	mov		eax, [ebp+_dump@_addr]		;convert_com20
+  2101 00000DFF 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2102 00000E04 E823F5                  	call	_printf_4x		;expr_function_call
+  2103 00000E07 6683C404                	add		esp, 0x4	;expr_function_call
+  2104                                  ;---------- c32_expr end ------
+  2105                                  ;---------- parser_dainyuu ----------
+  2106                                  ;---------- c32_expr ----------
+  2107                                  ;  96: 		putch(':');
+  2108                                  ;---------- call _putch ----------
+  2109 00000E0B 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2110 00000E0F 66B83A000000            	mov		eax, 0x3a		;convert_com20
+  2111 00000E15 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2112 00000E1A E87FF2                  	call	_putch		;expr_function_call
+  2113 00000E1D 6683C404                	add		esp, 0x4	;expr_function_call
+  2114                                  ;---------- c32_expr end ------
+  2115                                  ;---------- parser_for ----------
+  2116                                  ;  97: 		for(i=0; i<pre_len; i++){
+  2117                                  ;---------- parser_dainyuu ----------
+  2118                                  ;---------- c32_expr ----------
+  2119 00000E21 66B800000000            	mov		eax, 0x0		;convert_com20
+  2120 00000E27 6667894500              	mov		[ebp+_dump@_i], eax	;expr_eq
+  2121                                  ;---------- c32_expr end ------
+  2122                                  L4153:
+  2123                                  ;---------- c32_expr ----------
+  2124 00000E2C 66678B4500              	mov		eax, [ebp+_dump@_i]		;convert_com20
+  2125 00000E31 6650                    	push	eax		;factor9
+  2126 00000E33 66678B4504              	mov		eax, [ebp+_dump@_pre_len]		;convert_com20
+  2127 00000E38 665B                    	pop		ebx		;factor9
+  2128 00000E3A 6639C3                  	cmp		ebx, eax	;factor9
+  2129 00000E3D 66B801000000            	mov		eax, 1	;factor9
+  2130 00000E43 7C02                    	jl		L4176		;factor9
+  2131 00000E45 6648                    	dec		eax		;factor9
+  2132                                  L4176:		;factor8
+  2133                                  ;---------- c32_expr end ------
+  2134 00000E47 6621C0                  	and		eax, eax
+  2135 00000E4A 7430                    	jz		L4151
+  2136 00000E4C EB10                    	jmp		L4154
+  2137                                  L4152:
+  2138                                  ;---------- c32_expr ----------
+  2139 00000E4E 66678B5D00              	mov		ebx, [ebp+_dump@_i]		;factor13
+  2140 00000E53 666783450001            	add		dword	[ebp+_dump@_i], 0x1	;factor13
+  2141 00000E59 6689D8                  	mov		eax, ebx	;factor13
+  2142                                  ;---------- c32_expr end ------
+  2143 00000E5C EBCE                    	jmp		L4153
+  2144                                  L4154:
+  2145                                  ;---------- parser_block ----------
+  2146                                  ;---------- parser_function_block ----------
+  2147                                  ;---------- parser_dainyuu ----------
+  2148                                  ;---------- c32_expr ----------
+  2149                                  ;  98: 			puts("   ");
+  2150                                  ;---------- call _puts ----------
+  2151 00000E5E 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2152 00000E62 EB04                    	jmp		L4206
+  2153                                  L4205:
+  2154 00000E64 20                      	db		0x20
+  2155 00000E65 20                      	db		0x20
+  2156 00000E66 20                      	db		0x20
+  2157 00000E67 00                      	db		0x0
+  2158                                  L4206:
+  2159 00000E68 66B8[640E0000]          	mov		eax, L4205		;convert_com20
+  2160 00000E6E 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2161 00000E73 E88DF3                  	call	_puts		;expr_function_call
+  2162 00000E76 6683C404                	add		esp, 0x4	;expr_function_call
+  2163                                  ;---------- c32_expr end ------
+  2164                                  ;  99: 		}
+  2165 00000E7A EBD2                    	jmp		L4152
+  2166                                  L4151:
+  2167                                  ;---------- parser_for ----------
+  2168                                  ; 100: 		for( ; i<16; i++){
+  2169                                  L4209:
+  2170                                  ;---------- c32_expr ----------
+  2171 00000E7C 66678B4500              	mov		eax, [ebp+_dump@_i]		;convert_com20
+  2172 00000E81 6650                    	push	eax		;factor9
+  2173 00000E83 66B810000000            	mov		eax, 0x10		;convert_com20
+  2174 00000E89 665B                    	pop		ebx		;factor9
+  2175 00000E8B 6639C3                  	cmp		ebx, eax	;factor9
+  2176 00000E8E 66B801000000            	mov		eax, 1	;factor9
+  2177 00000E94 7C02                    	jl		L4216		;factor9
+  2178 00000E96 6648                    	dec		eax		;factor9
+  2179                                  L4216:		;factor8
+  2180                                  ;---------- c32_expr end ------
+  2181 00000E98 6621C0                  	and		eax, eax
+  2182 00000E9B 0F849700                	jz		L4207
+  2183 00000E9F EB10                    	jmp		L4210
+  2184                                  L4208:
+  2185                                  ;---------- c32_expr ----------
+  2186 00000EA1 66678B5D00              	mov		ebx, [ebp+_dump@_i]		;factor13
+  2187 00000EA6 666783450001            	add		dword	[ebp+_dump@_i], 0x1	;factor13
+  2188 00000EAC 6689D8                  	mov		eax, ebx	;factor13
+  2189                                  ;---------- c32_expr end ------
+  2190 00000EAF EBCB                    	jmp		L4209
+  2191                                  L4210:
+  2192                                  ;---------- parser_block ----------
+  2193                                  ;---------- parser_function_block ----------
+  2194                                  ;---------- parser_dainyuu ----------
+  2195                                  ;---------- c32_expr ----------
+  2196                                  ; 101: 			putch(' ');
+  2197                                  ;---------- call _putch ----------
+  2198 00000EB1 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2199 00000EB5 66B820000000            	mov		eax, 0x20		;convert_com20
+  2200 00000EBB 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2201 00000EC0 E8D9F1                  	call	_putch		;expr_function_call
+  2202 00000EC3 6683C404                	add		esp, 0x4	;expr_function_call
+  2203                                  ;---------- c32_expr end ------
+  2204                                  ;---------- parser_dainyuu ----------
+  2205                                  ;---------- c32_expr ----------
+  2206                                  ; 102: 			printf_2x(*(char*)(addr+i));
+  2207                                  ;---------- call _printf_2x ----------
+  2208 00000EC7 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2209                                  ;---------- c32_expr ----------
+  2210 00000ECB 66678B4500              	mov		eax, [ebp+_dump@_i]		;convert_com20
+  2211 00000ED0 6689C3                  	mov		ebx, eax	;factor11
+  2212 00000ED3 66678B450E              	mov		eax, [ebp+_dump@_addr]		;convert_com20
+  2213 00000ED8 6601D8                  	add		eax, ebx	;factor11
+  2214                                  ;---------- c32_expr end ------
+  2215 00000EDB 678A00                  	mov		al, [eax]		;convert_com20
+  2216 00000EDE 98                      	cbw		;convert_com10
+  2217 00000EDF 66                      	db 0x66
+  2218 00000EE0 98                      	db 0x98		;convert_com10
+  2219 00000EE1 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2220 00000EE6 E8F0F3                  	call	_printf_2x		;expr_function_call
+  2221 00000EE9 6683C404                	add		esp, 0x4	;expr_function_call
+  2222                                  ;---------- c32_expr end ------
+  2223                                  ;---------- parser_if ----------
+  2224                                  ; 103: 			if(--len==0){
+  2225                                  ;---------- c32_expr ----------
+  2226 00000EED 6667836D1201            	sub		dword	[ebp+_dump@_len], 0x1	;factor13
+  2227 00000EF3 66678B4512              	mov		eax, [ebp+_dump@_len]		;convert_com20
+  2228 00000EF8 6650                    	push	eax		;factor8
+  2229 00000EFA 66B800000000            	mov		eax, 0x0		;convert_com20
+  2230 00000F00 665B                    	pop		ebx		;factor8
+  2231 00000F02 6639D8                  	cmp		eax, ebx	;factor8
+  2232 00000F05 66B801000000            	mov		eax, 1	;factor8-9
+  2233 00000F0B 7402                    	jz		L4281		;factor8-10
+  2234 00000F0D 6648                    	dec		eax		;factor8-11
+  2235                                  L4281:		;factor8
+  2236                                  ;---------- c32_expr end ------
+  2237 00000F0F 6621C0                  	and		eax, eax
+  2238 00000F12 741F                    	jz		L4275
+  2239                                  ;---------- parser_block ----------
+  2240                                  ;---------- parser_function_block ----------
+  2241                                  ;---------- parser_dainyuu ----------
+  2242                                  ;---------- c32_expr ----------
+  2243                                  ; 104: 				putch('\n');
+  2244                                  ;---------- call _putch ----------
+  2245 00000F14 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2246 00000F18 66B80A000000            	mov		eax, 0xa		;convert_com20
+  2247 00000F1E 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2248 00000F23 E876F1                  	call	_putch		;expr_function_call
+  2249 00000F26 6683C404                	add		esp, 0x4	;expr_function_call
+  2250                                  ;---------- c32_expr end ------
+  2251                                  ;----------  parser_return  ---------
+  2252                                  ; 105: 				return;
+  2253 00000F2A 6683C408                	add		esp, 8		; auto variable clear
+  2254 00000F2E 665D                    	pop		ebp
+  2255 00000F30 C3                      	ret
+  2256                                  ; 106: 			}
+  2257 00000F31 EB00                    	jmp		L4276
+  2258                                  L4275:
+  2259                                  L4276:
+  2260                                  ; 107: 		}
+  2261 00000F33 E96BFF                  	jmp		L4208
+  2262                                  L4207:
+  2263                                  ;---------- parser_dainyuu ----------
+  2264                                  ;---------- c32_expr ----------
+  2265                                  ; 108: 		putch('\n');
+  2266                                  ;---------- call _putch ----------
+  2267 00000F36 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2268 00000F3A 66B80A000000            	mov		eax, 0xa		;convert_com20
+  2269 00000F40 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2270 00000F45 E854F1                  	call	_putch		;expr_function_call
+  2271 00000F48 6683C404                	add		esp, 0x4	;expr_function_call
+  2272                                  ;---------- c32_expr end ------
+  2273                                  ;---------- parser_dainyuu ----------
+  2274                                  ;---------- c32_expr ----------
+  2275                                  ; 109: 		addr += 16;
+  2276 00000F4C 66B810000000            	mov		eax, 0x10		;convert_com20
+  2277 00000F52 666701450E              	add		[ebp+_dump@_addr], eax	;expr_plus_eq
+  2278                                  ;---------- c32_expr end ------
+  2279                                  ; 110: 	}
+  2280 00000F57 EB00                    	jmp		L4110
+  2281                                  L4109:
+  2282                                  L4110:
+  2283                                  ;---------- parser_for ----------
+  2284                                  ; 111: 	for(;;){
+  2285                                  L4340:
+  2286 00000F59 EB02                    	jmp		L4341
+  2287                                  L4339:
+  2288 00000F5B EBFC                    	jmp		L4340
+  2289                                  L4341:
+  2290                                  ;---------- parser_block ----------
+  2291                                  ;---------- parser_function_block ----------
+  2292                                  ;---------- parser_dainyuu ----------
+  2293                                  ;---------- c32_expr ----------
+  2294                                  ; 112: 		printf_4x(addr);
+  2295                                  ;---------- call _printf_4x ----------
+  2296 00000F5D 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2297 00000F61 66678B450E              	mov		eax, [ebp+_dump@_addr]		;convert_com20
+  2298 00000F66 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2299 00000F6B E8BCF3                  	call	_printf_4x		;expr_function_call
+  2300 00000F6E 6683C404                	add		esp, 0x4	;expr_function_call
+  2301                                  ;---------- c32_expr end ------
+  2302                                  ;---------- parser_dainyuu ----------
+  2303                                  ;---------- c32_expr ----------
+  2304                                  ; 113: 		putch(':');
+  2305                                  ;---------- call _putch ----------
+  2306 00000F72 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2307 00000F76 66B83A000000            	mov		eax, 0x3a		;convert_com20
+  2308 00000F7C 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2309 00000F81 E818F1                  	call	_putch		;expr_function_call
+  2310 00000F84 6683C404                	add		esp, 0x4	;expr_function_call
+  2311                                  ;---------- c32_expr end ------
+  2312                                  ;---------- parser_for ----------
+  2313                                  ; 114: 		for(i=0; i<16; i++){
+  2314                                  ;---------- parser_dainyuu ----------
+  2315                                  ;---------- c32_expr ----------
+  2316 00000F88 66B800000000            	mov		eax, 0x0		;convert_com20
+  2317 00000F8E 6667894500              	mov		[ebp+_dump@_i], eax	;expr_eq
+  2318                                  ;---------- c32_expr end ------
+  2319                                  L4376:
+  2320                                  ;---------- c32_expr ----------
+  2321 00000F93 66678B4500              	mov		eax, [ebp+_dump@_i]		;convert_com20
+  2322 00000F98 6650                    	push	eax		;factor9
+  2323 00000F9A 66B810000000            	mov		eax, 0x10		;convert_com20
+  2324 00000FA0 665B                    	pop		ebx		;factor9
+  2325 00000FA2 6639C3                  	cmp		ebx, eax	;factor9
+  2326 00000FA5 66B801000000            	mov		eax, 1	;factor9
+  2327 00000FAB 7C02                    	jl		L4399		;factor9
+  2328 00000FAD 6648                    	dec		eax		;factor9
+  2329                                  L4399:		;factor8
+  2330                                  ;---------- c32_expr end ------
+  2331 00000FAF 6621C0                  	and		eax, eax
+  2332 00000FB2 0F849700                	jz		L4374
+  2333 00000FB6 EB10                    	jmp		L4377
+  2334                                  L4375:
+  2335                                  ;---------- c32_expr ----------
+  2336 00000FB8 66678B5D00              	mov		ebx, [ebp+_dump@_i]		;factor13
+  2337 00000FBD 666783450001            	add		dword	[ebp+_dump@_i], 0x1	;factor13
+  2338 00000FC3 6689D8                  	mov		eax, ebx	;factor13
+  2339                                  ;---------- c32_expr end ------
+  2340 00000FC6 EBCB                    	jmp		L4376
+  2341                                  L4377:
+  2342                                  ;---------- parser_block ----------
+  2343                                  ;---------- parser_function_block ----------
+  2344                                  ;---------- parser_dainyuu ----------
+  2345                                  ;---------- c32_expr ----------
+  2346                                  ; 115: 			putch(' ');
+  2347                                  ;---------- call _putch ----------
+  2348 00000FC8 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2349 00000FCC 66B820000000            	mov		eax, 0x20		;convert_com20
+  2350 00000FD2 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2351 00000FD7 E8C2F0                  	call	_putch		;expr_function_call
+  2352 00000FDA 6683C404                	add		esp, 0x4	;expr_function_call
+  2353                                  ;---------- c32_expr end ------
+  2354                                  ;---------- parser_dainyuu ----------
+  2355                                  ;---------- c32_expr ----------
+  2356                                  ; 116: 			printf_2x(*(char*)(addr+i));
+  2357                                  ;---------- call _printf_2x ----------
+  2358 00000FDE 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2359                                  ;---------- c32_expr ----------
+  2360 00000FE2 66678B4500              	mov		eax, [ebp+_dump@_i]		;convert_com20
+  2361 00000FE7 6689C3                  	mov		ebx, eax	;factor11
+  2362 00000FEA 66678B450E              	mov		eax, [ebp+_dump@_addr]		;convert_com20
+  2363 00000FEF 6601D8                  	add		eax, ebx	;factor11
+  2364                                  ;---------- c32_expr end ------
+  2365 00000FF2 678A00                  	mov		al, [eax]		;convert_com20
+  2366 00000FF5 98                      	cbw		;convert_com10
+  2367 00000FF6 66                      	db 0x66
+  2368 00000FF7 98                      	db 0x98		;convert_com10
+  2369 00000FF8 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2370 00000FFD E8D9F2                  	call	_printf_2x		;expr_function_call
+  2371 00001000 6683C404                	add		esp, 0x4	;expr_function_call
+  2372                                  ;---------- c32_expr end ------
+  2373                                  ;---------- parser_if ----------
+  2374                                  ; 117: 			if(--len==0){
+  2375                                  ;---------- c32_expr ----------
+  2376 00001004 6667836D1201            	sub		dword	[ebp+_dump@_len], 0x1	;factor13
+  2377 0000100A 66678B4512              	mov		eax, [ebp+_dump@_len]		;convert_com20
+  2378 0000100F 6650                    	push	eax		;factor8
+  2379 00001011 66B800000000            	mov		eax, 0x0		;convert_com20
+  2380 00001017 665B                    	pop		ebx		;factor8
+  2381 00001019 6639D8                  	cmp		eax, ebx	;factor8
+  2382 0000101C 66B801000000            	mov		eax, 1	;factor8-9
+  2383 00001022 7402                    	jz		L4464		;factor8-10
+  2384 00001024 6648                    	dec		eax		;factor8-11
+  2385                                  L4464:		;factor8
+  2386                                  ;---------- c32_expr end ------
+  2387 00001026 6621C0                  	and		eax, eax
+  2388 00001029 741F                    	jz		L4458
+  2389                                  ;---------- parser_block ----------
+  2390                                  ;---------- parser_function_block ----------
+  2391                                  ;---------- parser_dainyuu ----------
+  2392                                  ;---------- c32_expr ----------
+  2393                                  ; 118: 				putch('\n');
+  2394                                  ;---------- call _putch ----------
+  2395 0000102B 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2396 0000102F 66B80A000000            	mov		eax, 0xa		;convert_com20
+  2397 00001035 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2398 0000103A E85FF0                  	call	_putch		;expr_function_call
+  2399 0000103D 6683C404                	add		esp, 0x4	;expr_function_call
+  2400                                  ;---------- c32_expr end ------
+  2401                                  ;----------  parser_return  ---------
+  2402                                  ; 119: 				return;
+  2403 00001041 6683C408                	add		esp, 8		; auto variable clear
+  2404 00001045 665D                    	pop		ebp
+  2405 00001047 C3                      	ret
+  2406                                  ; 120: 			}
+  2407 00001048 EB00                    	jmp		L4459
+  2408                                  L4458:
+  2409                                  L4459:
+  2410                                  ; 121: 		}
+  2411 0000104A E96BFF                  	jmp		L4375
+  2412                                  L4374:
+  2413                                  ;---------- parser_dainyuu ----------
+  2414                                  ;---------- c32_expr ----------
+  2415                                  ; 122: 		putch('\n');
+  2416                                  ;---------- call _putch ----------
+  2417 0000104D 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2418 00001051 66B80A000000            	mov		eax, 0xa		;convert_com20
+  2419 00001057 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2420 0000105C E83DF0                  	call	_putch		;expr_function_call
+  2421 0000105F 6683C404                	add		esp, 0x4	;expr_function_call
+  2422                                  ;---------- c32_expr end ------
+  2423                                  ;---------- parser_dainyuu ----------
+  2424                                  ;---------- c32_expr ----------
+  2425                                  ; 123: 		addr += 16;
+  2426 00001063 66B810000000            	mov		eax, 0x10		;convert_com20
+  2427 00001069 666701450E              	add		[ebp+_dump@_addr], eax	;expr_plus_eq
+  2428                                  ;---------- c32_expr end ------
+  2429                                  ; 124: 	}
+  2430 0000106E E9EAFE                  	jmp		L4339
+  2431                                  L4338:
+  2432                                  ; 125: }
+  2433 00001071 6683C408                	add		esp, 8		; auto variable clear
+  2434 00001075 665D                    	pop		ebp
+  2435 00001077 C3                      	ret
+  2436                                  ; 126: 
+  2437                                  ; 127: int main()
+  2438                                  _main@_buf	equ	0
+  2439                                  _main@_addr	equ	256
+  2440                                  _main@_len	equ	260
+  2441                                  ;---------- function _main ----------
+  2442                                  _main:
+  2443 00001078 6655                    	push	ebp
+  2444 0000107A 6681C4F8FEFFFF          	add		esp, -264		; auto variable
+  2445 00001081 6689E5                  	mov		ebp, esp
+  2446                                  ;---------- parser_function_block ----------
+  2447                                  ; 128: {
+  2448                                  ; 129: 	char buf[256];
+  2449                                  ;---------- c32_expr ----------
+  2450                                  ;---------- c32_expr end ------
+  2451                                  ; 130: 	unsigned int addr, len;
+  2452                                  ;---------- parser_dainyuu ----------
+  2453                                  ;---------- c32_expr ----------
+  2454                                  ; 131: 	
+  2455                                  ; 132: 	puts("\nhelp message is \"help\"\n\n");
+  2456                                  ;---------- call _puts ----------
+  2457 00001084 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2458 00001088 EB1A                    	jmp		L4546
+  2459                                  L4545:
+  2460 0000108A 0A                      	db		0xa
+  2461 0000108B 68                      	db		0x68
+  2462 0000108C 65                      	db		0x65
+  2463 0000108D 6C                      	db		0x6c
+  2464 0000108E 70                      	db		0x70
+  2465 0000108F 20                      	db		0x20
+  2466 00001090 6D                      	db		0x6d
+  2467 00001091 65                      	db		0x65
+  2468 00001092 73                      	db		0x73
+  2469 00001093 73                      	db		0x73
+  2470 00001094 61                      	db		0x61
+  2471 00001095 67                      	db		0x67
+  2472 00001096 65                      	db		0x65
+  2473 00001097 20                      	db		0x20
+  2474 00001098 69                      	db		0x69
+  2475 00001099 73                      	db		0x73
+  2476 0000109A 20                      	db		0x20
+  2477 0000109B 22                      	db		0x22
+  2478 0000109C 68                      	db		0x68
+  2479 0000109D 65                      	db		0x65
+  2480 0000109E 6C                      	db		0x6c
+  2481 0000109F 70                      	db		0x70
+  2482 000010A0 22                      	db		0x22
+  2483 000010A1 0A                      	db		0xa
+  2484 000010A2 0A                      	db		0xa
+  2485 000010A3 00                      	db		0x0
+  2486                                  L4546:
+  2487 000010A4 66B8[8A100000]          	mov		eax, L4545		;convert_com20
+  2488 000010AA 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2489 000010AF E851F1                  	call	_puts		;expr_function_call
+  2490 000010B2 6683C404                	add		esp, 0x4	;expr_function_call
+  2491                                  ;---------- c32_expr end ------
+  2492                                  ;---------- parser_for ----------
+  2493                                  ; 133: 	for(;;){
+  2494                                  L4549:
+  2495 000010B6 EB02                    	jmp		L4550
+  2496                                  L4548:
+  2497 000010B8 EBFC                    	jmp		L4549
+  2498                                  L4550:
+  2499                                  ;---------- parser_block ----------
+  2500                                  ;---------- parser_function_block ----------
+  2501                                  ;---------- parser_dainyuu ----------
+  2502                                  ;---------- c32_expr ----------
+  2503                                  ; 134: 		puts("> ");
+  2504                                  ;---------- call _puts ----------
+  2505 000010BA 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2506 000010BE EB03                    	jmp		L4568
+  2507                                  L4567:
+  2508 000010C0 3E                      	db		0x3e
+  2509 000010C1 20                      	db		0x20
+  2510 000010C2 00                      	db		0x0
+  2511                                  L4568:
+  2512 000010C3 66B8[C0100000]          	mov		eax, L4567		;convert_com20
+  2513 000010C9 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2514 000010CE E832F1                  	call	_puts		;expr_function_call
+  2515 000010D1 6683C404                	add		esp, 0x4	;expr_function_call
+  2516                                  ;---------- c32_expr end ------
+  2517                                  ;---------- parser_dainyuu ----------
+  2518                                  ;---------- c32_expr ----------
+  2519                                  ; 135: 		gets(buf, 256);
+  2520                                  ;---------- call _gets ----------
+  2521 000010D5 6683EC08                	sub		esp, 0x8	;expr_function_call
+  2522 000010D9 6689E8                  	mov		eax, ebp
+  2523 000010DC 6683C000                	add		eax, _main@_buf
+  2524 000010E0 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2525 000010E5 66B800010000            	mov		eax, 0x100		;convert_com20
+  2526 000010EB 666789442404            	mov		[esp+0x4], eax		;expr_function_call
+  2527 000010F1 E802F0                  	call	_gets		;expr_function_call
+  2528 000010F4 6683C408                	add		esp, 0x8	;expr_function_call
+  2529                                  ;---------- c32_expr end ------
+  2530                                  ;---------- parser_dainyuu ----------
+  2531                                  ;---------- c32_expr ----------
+  2532                                  ; 136: 		linebufp = buf;
+  2533 000010F8 6689E8                  	mov		eax, ebp
+  2534 000010FB 6683C000                	add		eax, _main@_buf
+  2535 000010FF 66A3[2407]              	mov		[_linebufp], eax	;expr_eq
+  2536                                  ;---------- c32_expr end ------
+  2537                                  ;---------- parser_dainyuu ----------
+  2538                                  ;---------- c32_expr ----------
+  2539                                  ; 137: 		getsym();
+  2540                                  ;---------- call _getsym ----------
+  2541 00001103 E8D8F9                  	call	_getsym		;expr_function_call
+  2542                                  ;---------- c32_expr end ------
+  2543                                  ;---------- parser_if ----------
+  2544                                  ; 138: 		if(strcmp(symbuf, "help")==0){
+  2545                                  ;---------- c32_expr ----------
+  2546                                  ;---------- call _strcmp ----------
+  2547 00001106 6683EC08                	sub		esp, 0x8	;expr_function_call
+  2548 0000110A 66B8[E4060000]          	mov		eax, _symbuf		;convert_com20
+  2549 00001110 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2550 00001115 EB05                    	jmp		L4644
+  2551                                  L4643:
+  2552 00001117 68                      	db		0x68
+  2553 00001118 65                      	db		0x65
+  2554 00001119 6C                      	db		0x6c
+  2555 0000111A 70                      	db		0x70
+  2556 0000111B 00                      	db		0x0
+  2557                                  L4644:
+  2558 0000111C 66B8[17110000]          	mov		eax, L4643		;convert_com20
+  2559 00001122 666789442404            	mov		[esp+0x4], eax		;expr_function_call
+  2560 00001128 E8CAF4                  	call	_strcmp		;expr_function_call
+  2561 0000112B 6683C408                	add		esp, 0x8	;expr_function_call
+  2562 0000112F 6650                    	push	eax		;factor8
+  2563 00001131 66B800000000            	mov		eax, 0x0		;convert_com20
+  2564 00001137 665B                    	pop		ebx		;factor8
+  2565 00001139 6639D8                  	cmp		eax, ebx	;factor8
+  2566 0000113C 66B801000000            	mov		eax, 1	;factor8-9
+  2567 00001142 7402                    	jz		L4623		;factor8-10
+  2568 00001144 6648                    	dec		eax		;factor8-11
+  2569                                  L4623:		;factor8
+  2570                                  ;---------- c32_expr end ------
+  2571 00001146 6621C0                  	and		eax, eax
+  2572 00001149 7406                    	jz		L4617
+  2573                                  ;---------- parser_block ----------
+  2574                                  ;---------- parser_function_block ----------
+  2575                                  ;---------- parser_dainyuu ----------
+  2576                                  ;---------- c32_expr ----------
+  2577                                  ; 139: 			help();
+  2578                                  ;---------- call _help ----------
+  2579 0000114B E801FB                  	call	_help		;expr_function_call
+  2580                                  ;---------- c32_expr end ------
+  2581                                  ; 140: 		}
+  2582 0000114E E92901                  	jmp		L4618
+  2583                                  L4617:
+  2584                                  ; 141: 		else if(strcmp(symbuf, "dump")==0){
+  2585                                  ;---------- parser_block ----------
+  2586                                  ;---------- parser_if ----------
+  2587                                  ;---------- c32_expr ----------
+  2588                                  ;---------- call _strcmp ----------
+  2589 00001151 6683EC08                	sub		esp, 0x8	;expr_function_call
+  2590 00001155 66B8[E4060000]          	mov		eax, _symbuf		;convert_com20
+  2591 0000115B 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2592 00001160 EB05                    	jmp		L4683
+  2593                                  L4682:
+  2594 00001162 64                      	db		0x64
+  2595 00001163 75                      	db		0x75
+  2596 00001164 6D                      	db		0x6d
+  2597 00001165 70                      	db		0x70
+  2598 00001166 00                      	db		0x0
+  2599                                  L4683:
+  2600 00001167 66B8[62110000]          	mov		eax, L4682		;convert_com20
+  2601 0000116D 666789442404            	mov		[esp+0x4], eax		;expr_function_call
+  2602 00001173 E87FF4                  	call	_strcmp		;expr_function_call
+  2603 00001176 6683C408                	add		esp, 0x8	;expr_function_call
+  2604 0000117A 6650                    	push	eax		;factor8
+  2605 0000117C 66B800000000            	mov		eax, 0x0		;convert_com20
+  2606 00001182 665B                    	pop		ebx		;factor8
+  2607 00001184 6639D8                  	cmp		eax, ebx	;factor8
+  2608 00001187 66B801000000            	mov		eax, 1	;factor8-9
+  2609 0000118D 7402                    	jz		L4662		;factor8-10
+  2610 0000118F 6648                    	dec		eax		;factor8-11
+  2611                                  L4662:		;factor8
+  2612                                  ;---------- c32_expr end ------
+  2613 00001191 6621C0                  	and		eax, eax
+  2614 00001194 746A                    	jz		L4656
+  2615                                  ;---------- parser_block ----------
+  2616                                  ;---------- parser_function_block ----------
+  2617                                  ;---------- parser_dainyuu ----------
+  2618                                  ;---------- c32_expr ----------
+  2619                                  ; 142: 			getsym();
+  2620                                  ;---------- call _getsym ----------
+  2621 00001196 E845F9                  	call	_getsym		;expr_function_call
+  2622                                  ;---------- c32_expr end ------
+  2623                                  ;---------- parser_dainyuu ----------
+  2624                                  ;---------- c32_expr ----------
+  2625                                  ; 143: 			addr = getnum(symbuf);
+  2626                                  ;---------- call _getnum ----------
+  2627 00001199 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2628 0000119D 66B8[E4060000]          	mov		eax, _symbuf		;convert_com20
+  2629 000011A3 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2630 000011A8 E87DF5                  	call	_getnum		;expr_function_call
+  2631 000011AB 6683C404                	add		esp, 0x4	;expr_function_call
+  2632 000011AF 6667898500010000        	mov		[ebp+_main@_addr], eax	;expr_eq
+  2633                                  ;---------- c32_expr end ------
+  2634                                  ;---------- parser_dainyuu ----------
+  2635                                  ;---------- c32_expr ----------
+  2636                                  ; 144: 			getsym();
+  2637                                  ;---------- call _getsym ----------
+  2638 000011B7 E824F9                  	call	_getsym		;expr_function_call
+  2639                                  ;---------- c32_expr end ------
+  2640                                  ;---------- parser_dainyuu ----------
+  2641                                  ;---------- c32_expr ----------
+  2642                                  ; 145: 			len  = getnum(symbuf);
+  2643                                  ;---------- call _getnum ----------
+  2644 000011BA 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2645 000011BE 66B8[E4060000]          	mov		eax, _symbuf		;convert_com20
+  2646 000011C4 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2647 000011C9 E85CF5                  	call	_getnum		;expr_function_call
+  2648 000011CC 6683C404                	add		esp, 0x4	;expr_function_call
+  2649 000011D0 6667898504010000        	mov		[ebp+_main@_len], eax	;expr_eq
+  2650                                  ;---------- c32_expr end ------
+  2651                                  ;---------- parser_dainyuu ----------
+  2652                                  ;---------- c32_expr ----------
+  2653                                  ; 146: 			dump(addr, len);
+  2654                                  ;---------- call _dump ----------
+  2655 000011D8 6683EC08                	sub		esp, 0x8	;expr_function_call
+  2656 000011DC 66678B8500010000        	mov		eax, [ebp+_main@_addr]		;convert_com20
+  2657 000011E4 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2658 000011E9 66678B8504010000        	mov		eax, [ebp+_main@_len]		;convert_com20
+  2659 000011F1 666789442404            	mov		[esp+0x4], eax		;expr_function_call
+  2660 000011F7 E849FB                  	call	_dump		;expr_function_call
+  2661 000011FA 6683C408                	add		esp, 0x8	;expr_function_call
+  2662                                  ;---------- c32_expr end ------
+  2663                                  ; 147: 		}
+  2664 000011FE EB7A                    	jmp		L4657
+  2665                                  L4656:
+  2666                                  ; 148: 		else if(strcmp(symbuf, "exit")==0){
+  2667                                  ;---------- parser_block ----------
+  2668                                  ;---------- parser_if ----------
+  2669                                  ;---------- c32_expr ----------
+  2670                                  ;---------- call _strcmp ----------
+  2671 00001200 6683EC08                	sub		esp, 0x8	;expr_function_call
+  2672 00001204 66B8[E4060000]          	mov		eax, _symbuf		;convert_com20
+  2673 0000120A 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2674 0000120F EB05                    	jmp		L4802
+  2675                                  L4801:
+  2676 00001211 65                      	db		0x65
+  2677 00001212 78                      	db		0x78
+  2678 00001213 69                      	db		0x69
+  2679 00001214 74                      	db		0x74
+  2680 00001215 00                      	db		0x0
+  2681                                  L4802:
+  2682 00001216 66B8[11120000]          	mov		eax, L4801		;convert_com20
+  2683 0000121C 666789442404            	mov		[esp+0x4], eax		;expr_function_call
+  2684 00001222 E8D0F3                  	call	_strcmp		;expr_function_call
+  2685 00001225 6683C408                	add		esp, 0x8	;expr_function_call
+  2686 00001229 6650                    	push	eax		;factor8
+  2687 0000122B 66B800000000            	mov		eax, 0x0		;convert_com20
+  2688 00001231 665B                    	pop		ebx		;factor8
+  2689 00001233 6639D8                  	cmp		eax, ebx	;factor8
+  2690 00001236 66B801000000            	mov		eax, 1	;factor8-9
+  2691 0000123C 7402                    	jz		L4781		;factor8-10
+  2692 0000123E 6648                    	dec		eax		;factor8-11
+  2693                                  L4781:		;factor8
+  2694                                  ;---------- c32_expr end ------
+  2695 00001240 6621C0                  	and		eax, eax
+  2696 00001243 7412                    	jz		L4775
+  2697                                  ;---------- parser_block ----------
+  2698                                  ;---------- parser_function_block ----------
+  2699                                  ;----------  parser_return  ---------
+  2700                                  ; 149: 			return 0;
+  2701                                  ;---------- c32_expr ----------
+  2702                                  ;---------- c32_expr end ------
+  2703 00001245 66B800000000            	mov		eax, 0x0		;convert_com20
+  2704 0000124B 6681C408010000          	add		esp, 264		; auto variable clear
+  2705 00001252 665D                    	pop		ebp
+  2706 00001254 C3                      	ret
+  2707                                  ; 150: 		}
+  2708 00001255 EB23                    	jmp		L4776
+  2709                                  L4775:
+  2710                                  ; 151: 		else{
+  2711                                  ;---------- parser_block ----------
+  2712                                  ;---------- parser_function_block ----------
+  2713                                  ;---------- parser_dainyuu ----------
+  2714                                  ;---------- c32_expr ----------
+  2715                                  ; 152: 			puts("*** error\n");
+  2716                                  ;---------- call _puts ----------
+  2717 00001257 6683EC04                	sub		esp, 0x4	;expr_function_call
+  2718 0000125B EB0B                    	jmp		L4831
+  2719                                  L4830:
+  2720 0000125D 2A                      	db		0x2a
+  2721 0000125E 2A                      	db		0x2a
+  2722 0000125F 2A                      	db		0x2a
+  2723 00001260 20                      	db		0x20
+  2724 00001261 65                      	db		0x65
+  2725 00001262 72                      	db		0x72
+  2726 00001263 72                      	db		0x72
+  2727 00001264 6F                      	db		0x6f
+  2728 00001265 72                      	db		0x72
+  2729 00001266 0A                      	db		0xa
+  2730 00001267 00                      	db		0x0
+  2731                                  L4831:
+  2732 00001268 66B8[5D120000]          	mov		eax, L4830		;convert_com20
+  2733 0000126E 6667890424              	mov		[esp+0x0], eax		;expr_function_call
+  2734 00001273 E88DEF                  	call	_puts		;expr_function_call
+  2735 00001276 6683C404                	add		esp, 0x4	;expr_function_call
+  2736                                  ;---------- c32_expr end ------
+  2737                                  ; 153: 		}
+  2738                                  L4776:
+  2739                                  L4657:
+  2740                                  L4618:
+  2741                                  ; 154: 	}
+  2742 0000127A E93BFE                  	jmp		L4548
+  2743                                  L4547:
+  2744                                  ; 155: }
+  2745 0000127D 6681C408010000          	add		esp, 264		; auto variable clear
+  2746 00001284 665D                    	pop		ebp
+  2747 00001286 C3                      	ret
+  2748                                  ;----------  startup  ----------
+  2749                                  startup:
+  2750 00001287 E8EEFD                  	call	_main
+  2751 0000128A CD20                    	int		0x20	;exit
+  2752 0000128C EBFE                    	jmp		$
+  2753                                  ; edi: dst_addr
+  2754                                  ; esi: src_addr
+  2755                                  ; ecx: byte
+  2756                                  startup_memcpy:
+  2757 0000128E 678A1E                  	mov		bl, [esi]
+  2758 00001291 67881F                  	mov		[edi], bl
+  2759 00001294 6646                    	inc		esi
+  2760 00001296 6647                    	inc		edi
+  2761 00001298 6649                    	dec		ecx
+  2762 0000129A 75F2                    	jnz		startup_memcpy
+  2763 0000129C C3                      	ret
